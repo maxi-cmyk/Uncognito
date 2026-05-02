@@ -2,5 +2,11 @@
   "name": "@uncognito/random-trigger",
   "private": true,
   "type": "module",
-  "description": "Poisson-based capture scheduling and Chrome alarm timing helpers"
+  "description": "Poisson-based capture scheduling and Chrome alarm timing helpers",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.ts"
+  }
 }

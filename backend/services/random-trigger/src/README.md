@@ -1,6 +1,6 @@
 # Source Layout
 
-Expected implementation modules:
+Implementation modules:
 
 - `presets.ts` - intensity preset constants and validation.
 - `exponential.ts` - pure exponential sampling and random normalization.

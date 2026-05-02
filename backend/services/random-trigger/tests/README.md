@@ -1,6 +1,6 @@
 # Random Trigger Tests
 
-Expected deterministic test coverage:
+Deterministic test coverage:
 
 - Preset validation for `low`, `medium`, `high`, and `demo`.
 - Exponential sampling with injected random values.
