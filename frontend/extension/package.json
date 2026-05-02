@@ -1,0 +1,5 @@
+{
+  "name": "@uncognito/extension",
+  "private": true,
+  "type": "module"
+}

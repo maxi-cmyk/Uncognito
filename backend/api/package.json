@@ -1,0 +1,5 @@
+{
+  "name": "@uncognito/api",
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "uncognito",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend/*",
+    "backend/api",
+    "backend/services/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter @uncognito/web --if-present dev",
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck"
+  }
+}
