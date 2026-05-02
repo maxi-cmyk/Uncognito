@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Uncognito</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="header">
+        <div>
+          <h1>Uncognito</h1>
+          <p id="statusText">Loading...</p>
+        </div>
+        <label class="switch" title="Enable capture">
+          <input id="enabledInput" type="checkbox" />
+          <span></span>
+        </label>
+      </header>
+
+      <section class="field">
+        <label for="backendUrlInput">Backend URL</label>
+        <input id="backendUrlInput" type="url" placeholder="http://localhost:3000" />
+      </section>
+
+      <section class="field">
+        <label for="intensityInput">Intensity</label>
+        <select id="intensityInput">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="demo">Demo</option>
+        </select>
+      </section>
+
+      <section class="actions">
+        <button id="roastNowButton" type="button">Roast me now</button>
+        <button id="linkedInButton" type="button">Screenshot + LinkedIn Link</button>
+      </section>
+
+      <dl class="meta">
+        <div>
+          <dt>Last capture</dt>
+          <dd id="lastCaptureText">Never</dd>
+        </div>
+        <div>
+          <dt>Next capture</dt>
+          <dd id="nextCaptureText">Not scheduled</dd>
+        </div>
+      </dl>
+
+      <section class="links" id="linksSection" hidden>
+        <a id="roastLink" target="_blank" rel="noreferrer">Open roast</a>
+        <a id="linkedInLink" target="_blank" rel="noreferrer" hidden>Open LinkedIn share</a>
+      </section>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>
