@@ -113,9 +113,6 @@ Needs:
 
 ### 6.3 Could Have
 
-- Telegram posting.
-- LinkedIn share flow.
-- Slack or Discord webhook.
 - Roast tone selector.
 - Blur controls on the portal.
 - Leaderboard for multiple users.
@@ -196,7 +193,7 @@ For the MVP, social sharing can be link-based instead of fully automated. The ro
 - `og:url`
 - `twitter:card`
 
-If automated posting is attempted, Telegram or Discord webhook integration is preferred for hackathon reliability. LinkedIn is represented through a share URL unless API access is already available.
+LinkedIn is represented through a share URL unless API access is already available. Automated posting to other platforms is not included in the MVP.
 
 ## 9. Core User Flows
 
@@ -402,11 +399,6 @@ MVP:
 - Copy/share roast link.
 - Ensure Open Graph metadata works.
 
-Preferred hackathon automation:
-
-- Telegram bot message with roast link.
-- Discord webhook message with roast link.
-
 LinkedIn handling:
 
 - Provide a LinkedIn share URL or manual copy flow.
@@ -501,7 +493,7 @@ When `captureMode` is `demo_linkedin_link`, the response may also include:
 | Extension | Manifest V3, JavaScript or React | Keep popup small |
 | Image hosting | Supabase Storage | Stable public image URLs for Open Graph previews |
 | AI | Configurable OpenAI vision-capable model | Use env var for model selection |
-| Social | Telegram, Discord, or manual share | Prefer reliable setup over LinkedIn automation |
+| Social | Manual share and LinkedIn share-link demo flow | Prefer reliable setup over LinkedIn automation |
 
 ### 13.2 System Flow
 
@@ -534,9 +526,6 @@ SUPABASE_STORAGE_BUCKET=roast-images
 OPENAI_API_KEY=
 OPENAI_VISION_MODEL=
 PUBLIC_APP_URL=
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-DISCORD_WEBHOOK_URL=
 ADMIN_TOKEN=
 ```
 
@@ -677,7 +666,7 @@ ADMIN_TOKEN=
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| LinkedIn API access is difficult | Demo may fail | Use a manual LinkedIn share link or Telegram/Discord first |
+| LinkedIn API access is difficult | Demo may fail | Use a manual LinkedIn share link first |
 | Screenshot leaks sensitive data | User trust issue | Opt-in, prompt safety, no raw logging, delete/hide; automated redaction is future work |
 | AI output is weak | Joke falls flat | Add prompt constraints and fallback captions |
 | Extension permissions are confusing | Setup friction | Keep permissions minimal and explain consent |
@@ -688,7 +677,7 @@ ADMIN_TOKEN=
 ## 20. Hackathon Implementation Decisions
 
 - **Publishing model:** Roasts publish immediately after upload because explicit opt-in is part of setup. Approval queue is a future enhancement.
-- **Social channel:** Manual link sharing is the guaranteed MVP path. Telegram or Discord webhook is the preferred automated stretch path.
+- **Social channel:** Manual link sharing is the guaranteed MVP path.
 - **Owner controls:** Hide/delete actions require an `ADMIN_TOKEN` for the hackathon version.
 - **Repository shape:** Use one monorepo containing the web app, API routes, shared types, and extension package.
 - **Local demo fallback:** Local/mock image storage is acceptable for development, but the deployed demo should use Supabase Storage public URLs so Open Graph previews work.

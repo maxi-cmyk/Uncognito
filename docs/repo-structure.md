@@ -102,6 +102,7 @@ This repository is organized around the simple product boundary the team wants:
 |-- config/
 |   `-- README.md
 `-- docs/
+    |-- mcp.md
     |-- PRD.md
     |-- repo-structure.md
     `-- techstack.md

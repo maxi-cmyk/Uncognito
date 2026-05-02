@@ -46,4 +46,4 @@ npm test
 - `scripts/` - local development and automation scripts.
 - `config/` - shared tool configuration.
 
-Start with [docs/PRD.md](docs/PRD.md), [docs/techstack.md](docs/techstack.md), and [docs/repo-structure.md](docs/repo-structure.md).
+Start with [docs/PRD.md](docs/PRD.md), [docs/techstack.md](docs/techstack.md), [docs/repo-structure.md](docs/repo-structure.md), and [docs/mcp.md](docs/mcp.md).

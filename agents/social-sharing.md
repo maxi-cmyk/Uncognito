@@ -8,8 +8,7 @@ Make each roast easy to share, while keeping the guaranteed MVP path independent
 
 - Copy/share link behavior.
 - Social metadata requirements.
-- Optional Telegram or Discord webhook integration.
-- Optional LinkedIn share URL.
+- LinkedIn share URL.
 - Demo-only LinkedIn share-link trigger contract.
 - Share status tracking.
 
@@ -32,27 +31,14 @@ Make each roast easy to share, while keeping the guaranteed MVP path independent
 
 - Working copy/share path.
 - Metadata checklist for Web Vault Agent.
-- Optional webhook sender behind configuration.
-- LinkedIn demo output: a LinkedIn share URL for the roast page.
+- LinkedIn share URL for the roast page.
 - Predictable failure behavior when social provider calls fail.
 
 ## MVP Policy
 
 - Manual link sharing is required.
 - Screenshot + LinkedIn Link is a manual demo path, not background automation.
-- Automated posting is optional.
-- Telegram or Discord is preferred for hackathon automation.
 - Official LinkedIn API integration is stretch.
-
-## Environment Variables
-
-```text
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-DISCORD_WEBHOOK_URL=
-```
-
-Only variables for enabled providers are required.
 
 ## Industry Practices
 
@@ -74,8 +60,7 @@ Only variables for enabled providers are required.
 
 - Copy link works without any provider credentials.
 - Screenshot + LinkedIn Link returns a LinkedIn share URL without provider credentials.
-- Missing webhook credentials do not break roast creation.
-- Configured webhook sends a public roast URL.
+- Missing credentials do not break roast creation.
 - Social provider failure marks share failed but leaves roast visible.
 - Link preview can read the public page metadata.
 

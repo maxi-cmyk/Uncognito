@@ -45,7 +45,6 @@ Keep Uncognito scoped as a small hackathon MVP while preserving the core product
 - Immediate publishing is the default after explicit opt-in.
 - Manual link sharing is the guaranteed social path.
 - Screenshot + LinkedIn Link is a demo-only manual path that prepares a roast URL and LinkedIn share URL without requiring LinkedIn API access.
-- Telegram or Discord webhook is stretch.
 - Privacy redaction is deferred until after the MVP demo; opt-in, hide/delete, rate limits, and no raw screenshot logging remain in scope.
 - `ADMIN_TOKEN` protects hide/delete actions.
 - Monorepo is the default repository shape.

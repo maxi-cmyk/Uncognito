@@ -16,7 +16,7 @@ Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The fron
 | Schema migrations | Supabase SQL migrations | Direct SQL keeps schema, enums, indexes, triggers, and policies explicit. |
 | Image storage | Supabase Storage | Public bucket URLs satisfy Open Graph crawler requirements. |
 | AI | OpenAI vision-capable model via env config | The roast generator needs screenshot understanding and controlled text output. |
-| Social sharing | Manual link and LinkedIn share-link demo flow first; Telegram/Discord webhooks optional | Manual share is reliable for demos; webhooks are easier than LinkedIn automation. |
+| Social sharing | Manual link and LinkedIn share-link demo flow first | Manual share is reliable for demos. |
 | Unit testing | Node built-in test runner | Current service and integration tests run with `node --test` without extra test dependencies. |
 | E2E testing | Playwright | Browser-level verification for portal flows and share metadata. |
 | Code quality | ESLint, Prettier, TypeScript strict mode | Baseline consistency without heavy process. |
@@ -83,7 +83,7 @@ Placeholder for future redaction, caption safety helpers, consent copy helpers, 
 
 ### `backend/services/social`
 
-Owns copy/share helpers, Telegram or Discord webhook adapters, and share status normalization.
+Owns copy/share helpers and share status normalization.
 
 ## Environment Variables
 
@@ -95,9 +95,6 @@ SUPABASE_STORAGE_BUCKET=roast-images
 OPENAI_API_KEY=
 OPENAI_VISION_MODEL=
 PUBLIC_APP_URL=
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-DISCORD_WEBHOOK_URL=
 ADMIN_TOKEN=
 ```
 
