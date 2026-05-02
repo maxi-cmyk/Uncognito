@@ -5,6 +5,8 @@
  * @typedef {import("@uncognito/shared").ShareStatus} ShareStatus
  */
 
+const LOG_PREFIX = "[storage]";
+
 /**
  * Create a processing roast record.
  * @param {SupabaseClient} supabase
@@ -12,6 +14,8 @@
  * @returns {Promise<Roast>}
  */
 export async function createProcessingRoast(supabase, input) {
+  console.log(`${LOG_PREFIX} Creating processing roast | captureMode=${input.captureMode}`);
+
   const { data, error } = await supabase
     .from("roasts")
     .insert({
@@ -23,7 +27,12 @@ export async function createProcessingRoast(supabase, input) {
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to create roast: ${error.message}`);
+  if (error) {
+    console.error(`${LOG_PREFIX} Failed to create roast | error=${error.message}`);
+    throw new Error(`Failed to create roast: ${error.message}`);
+  }
+
+  console.log(`${LOG_PREFIX} Created processing roast | id=${mapRow(data).id}`);
   return mapRow(data);
 }
 
@@ -38,6 +47,8 @@ export async function uploadRoastImage(supabase, input) {
   const ext = getImageExtension(input.imageBase64);
   const imagePath = `roasts/${input.roastId}/capture.${ext}`;
 
+  console.log(`${LOG_PREFIX} Uploading image | roastId=${input.roastId} path=${imagePath} bucket=${bucket}`);
+
   const bytes = Buffer.from(input.imageBase64.split(",")[1], "base64");
 
   const { error } = await supabase.storage
@@ -47,10 +58,14 @@ export async function uploadRoastImage(supabase, input) {
       upsert: true,
     });
 
-  if (error) throw new Error(`Failed to upload image: ${error.message}`);
+  if (error) {
+    console.error(`${LOG_PREFIX} Image upload failed | roastId=${input.roastId} error=${error.message}`);
+    throw new Error(`Failed to upload image: ${error.message}`);
+  }
 
   const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(imagePath);
 
+  console.log(`${LOG_PREFIX} Image uploaded | roastId=${input.roastId} url=${urlData.publicUrl}`);
   return { imagePath, imageUrl: urlData.publicUrl };
 }
 
@@ -61,6 +76,8 @@ export async function uploadRoastImage(supabase, input) {
  * @returns {Promise<Roast>}
  */
 export async function publishRoast(supabase, input) {
+  console.log(`${LOG_PREFIX} Publishing roast | roastId=${input.roastId} caption=${input.caption.slice(0, 60)}...`);
+
   const { data, error } = await supabase
     .from("roasts")
     .update({
@@ -74,7 +91,12 @@ export async function publishRoast(supabase, input) {
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to publish roast: ${error.message}`);
+  if (error) {
+    console.error(`${LOG_PREFIX} Publish failed | roastId=${input.roastId} error=${error.message}`);
+    throw new Error(`Failed to publish roast: ${error.message}`);
+  }
+
+  console.log(`${LOG_PREFIX} Roast published | roastId=${input.roastId}`);
   return mapRow(data);
 }
 
@@ -86,6 +108,8 @@ export async function publishRoast(supabase, input) {
  * @returns {Promise<Roast>}
  */
 export async function markRoastFailed(supabase, roastId, reason) {
+  console.warn(`${LOG_PREFIX} Marking roast failed | roastId=${roastId} reason=${reason}`);
+
   const { data, error } = await supabase
     .from("roasts")
     .update({ status: "failed", error_reason: reason })
@@ -115,6 +139,7 @@ export async function listPublicRoasts(supabase, options = {}) {
     .range(offset, offset + limit - 1);
 
   if (error) throw new Error(`Failed to list roasts: ${error.message}`);
+  console.log(`${LOG_PREFIX} Listed public roasts | count=${count || 0}`);
   return { roasts: (data || []).map(mapRow), total: count || 0 };
 }
 
@@ -134,6 +159,26 @@ export async function getPublicRoast(supabase, id) {
 
   if (error) return null;
   return mapRow(data);
+}
+
+/**
+ * List all roasts regardless of status (admin only).
+ * @param {SupabaseClient} supabase
+ * @param {{ limit?: number, offset?: number }} [options]
+ * @returns {Promise<{ roasts: Roast[], total: number }>}
+ */
+export async function listAllRoasts(supabase, options = {}) {
+  const limit = options.limit || 100;
+  const offset = options.offset || 0;
+
+  const { data, count, error } = await supabase
+    .from("roasts")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) throw new Error(`Failed to list roasts: ${error.message}`);
+  return { roasts: (data || []).map(mapRow), total: count || 0 };
 }
 
 /**
@@ -160,6 +205,8 @@ export async function getRoast(supabase, id) {
  * @returns {Promise<Roast>}
  */
 export async function hideRoast(supabase, roastId) {
+  console.log(`${LOG_PREFIX} Hiding roast | roastId=${roastId}`);
+
   const { data, error } = await supabase
     .from("roasts")
     .update({ status: "hidden", hidden_at: new Date().toISOString() })
@@ -168,6 +215,7 @@ export async function hideRoast(supabase, roastId) {
     .single();
 
   if (error) throw new Error(`Failed to hide roast: ${error.message}`);
+  console.log(`${LOG_PREFIX} Roast hidden | roastId=${roastId}`);
   return mapRow(data);
 }
 
@@ -178,12 +226,15 @@ export async function hideRoast(supabase, roastId) {
  * @returns {Promise<void>}
  */
 export async function deleteRoast(supabase, roastId) {
+  console.log(`${LOG_PREFIX} Deleting roast | roastId=${roastId}`);
+
   const { error: delError } = await supabase
     .from("roasts")
     .update({ status: "deleted", deleted_at: new Date().toISOString() })
     .eq("id", roastId);
 
   if (delError) throw new Error(`Failed to delete roast: ${delError.message}`);
+  console.log(`${LOG_PREFIX} Roast deleted | roastId=${roastId}`);
 }
 
 /**
@@ -194,6 +245,8 @@ export async function deleteRoast(supabase, roastId) {
  * @returns {Promise<Roast>}
  */
 export async function updateShareStatus(supabase, roastId, status) {
+  console.log(`${LOG_PREFIX} Updating share status | roastId=${roastId} status=${status}`);
+
   const { data, error } = await supabase
     .from("roasts")
     .update({ share_status: status })
@@ -213,11 +266,18 @@ export async function updateShareStatus(supabase, roastId, status) {
  * @returns {Promise<void>}
  */
 export async function deleteRoastImage(supabase, imagePath, bucket) {
+  console.log(`${LOG_PREFIX} Deleting image | path=${imagePath}`);
+
   const { error } = await supabase.storage
     .from(bucket || "roast-images")
     .remove([imagePath]);
 
-  if (error) throw new Error(`Failed to delete image: ${error.message}`);
+  if (error) {
+    console.error(`${LOG_PREFIX} Image deletion failed | path=${imagePath} error=${error.message}`);
+    throw new Error(`Failed to delete image: ${error.message}`);
+  }
+
+  console.log(`${LOG_PREFIX} Image deleted | path=${imagePath}`);
 }
 
 /**
@@ -256,4 +316,64 @@ function getImageExtension(dataUri) {
   const match = dataUri.match(/^data:image\/(png|jpeg|webp);/);
   if (match) return match[1] === "jpeg" ? "jpg" : match[1];
   return "png";
+}
+
+/**
+ * @typedef {{ allowed: boolean, retryAfterSeconds?: number }} RateLimitResult
+ */
+
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const RATE_LIMIT_MAX_ATTEMPTS = 5;
+
+/**
+ * Check whether a client fingerprint has exceeded the rate limit.
+ * @param {SupabaseClient} supabase
+ * @param {string} fingerprint
+ * @param {{ windowSeconds?: number, maxAttempts?: number }} [options]
+ * @returns {Promise<RateLimitResult>}
+ */
+export async function checkRateLimit(supabase, fingerprint, options = {}) {
+  const windowSeconds = options.windowSeconds || RATE_LIMIT_WINDOW_SECONDS;
+  const maxAttempts = options.maxAttempts || RATE_LIMIT_MAX_ATTEMPTS;
+
+  const cutoff = new Date(Date.now() - windowSeconds * 1000).toISOString();
+
+  const { count, error } = await supabase
+    .from("upload_attempts")
+    .select("*", { count: "exact", head: true })
+    .eq("client_fingerprint", fingerprint)
+    .eq("outcome", "accepted")
+    .gte("created_at", cutoff);
+
+  if (error) {
+    console.error(`${LOG_PREFIX} Rate limit check failed | error=${error.message}`);
+    return { allowed: true };
+  }
+
+  if (count >= maxAttempts) {
+    console.warn(`${LOG_PREFIX} Rate limit reached | fingerprint=${fingerprint} count=${count}/${maxAttempts}`);
+    return { allowed: false, retryAfterSeconds: windowSeconds };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Record an upload attempt for rate limiting.
+ * @param {SupabaseClient} supabase
+ * @param {{ fingerprint: string, captureMode: import("@uncognito/shared").CaptureMode, outcome: string, roastId?: string, errorCode?: string }} input
+ * @returns {Promise<void>}
+ */
+export async function recordUploadAttempt(supabase, input) {
+  try {
+    await supabase.from("upload_attempts").insert({
+      client_fingerprint: input.fingerprint,
+      capture_mode: input.captureMode,
+      outcome: input.outcome,
+      roast_id: input.roastId || null,
+      error_code: input.errorCode || null,
+    });
+  } catch (error) {
+    console.error(`${LOG_PREFIX} Failed to record upload attempt | fingerprint=${input.fingerprint} error=${error.message}`);
+  }
 }

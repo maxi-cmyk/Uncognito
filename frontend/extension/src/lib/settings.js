@@ -21,6 +21,7 @@ export function normalizeSettings(settings) {
 
   return {
     ...merged,
+    consented: Boolean(merged.consented),
     enabled: Boolean(merged.enabled),
     intensity: ["low", "medium", "high", "demo"].includes(merged.intensity)
       ? merged.intensity

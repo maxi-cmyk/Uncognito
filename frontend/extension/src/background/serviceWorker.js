@@ -54,6 +54,9 @@ async function handleMessage(message) {
       });
     case "SCHEDULE_NEXT":
       return scheduleNextCapture();
+    case "SET_CONSENT":
+      await patchSettings({ consented: true });
+      return getSettings();
     default:
       throw new Error("Unknown extension message.");
   }

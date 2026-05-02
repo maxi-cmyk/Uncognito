@@ -1,5 +1,6 @@
 export const DEFAULT_SETTINGS = Object.freeze({
   enabled: false,
+  consented: false,
   intensity: "demo",
   backendUrl: "http://localhost:3000",
   lastCaptureAt: null,

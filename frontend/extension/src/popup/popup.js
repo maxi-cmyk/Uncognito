@@ -12,6 +12,9 @@ const elements = {
   linksSection: document.querySelector("#linksSection"),
   roastLink: document.querySelector("#roastLink"),
   linkedInLink: document.querySelector("#linkedInLink"),
+  consentGate: document.querySelector("#consentGate"),
+  controlsArea: document.querySelector("#controlsArea"),
+  consentButton: document.querySelector("#consentButton"),
 };
 
 document.addEventListener("DOMContentLoaded", hydrate);
@@ -20,10 +23,23 @@ elements.backendUrlInput.addEventListener("change", updateSettingsFromForm);
 elements.intensityInput.addEventListener("change", updateSettingsFromForm);
 elements.roastNowButton.addEventListener("click", () => capture(CAPTURE_MODES.MANUAL));
 elements.linkedInButton.addEventListener("click", () => capture(CAPTURE_MODES.LINKEDIN_LINK));
+elements.consentButton.addEventListener("click", acceptConsent);
 
 async function hydrate() {
   const settings = await sendMessage({ type: "GET_SETTINGS" });
   render(settings);
+}
+
+async function acceptConsent() {
+  setBusy(true);
+  try {
+    const settings = await sendMessage({ type: "SET_CONSENT" });
+    render(settings);
+  } catch (error) {
+    elements.statusText.textContent = error.message;
+  } finally {
+    setBusy(false);
+  }
 }
 
 async function updateSettingsFromForm() {
@@ -65,6 +81,16 @@ async function capture(captureMode) {
 }
 
 function render(settings) {
+  const hasConsented = Boolean(settings.consented);
+
+  elements.consentGate.hidden = hasConsented;
+  elements.controlsArea.hidden = !hasConsented;
+
+  if (!hasConsented) {
+    elements.statusText.textContent = "Review the consent notice before enabling.";
+    return;
+  }
+
   elements.enabledInput.checked = settings.enabled;
   elements.backendUrlInput.value = settings.backendUrl;
   elements.intensityInput.value = settings.intensity;
@@ -85,6 +111,7 @@ function render(settings) {
 function setBusy(isBusy) {
   elements.roastNowButton.disabled = isBusy;
   elements.linkedInButton.disabled = isBusy;
+  elements.consentButton.disabled = isBusy;
   elements.enabledInput.disabled = isBusy;
   elements.backendUrlInput.disabled = isBusy;
   elements.intensityInput.disabled = isBusy;

@@ -19,6 +19,16 @@
         </label>
       </header>
 
+      <div class="consent" id="consentGate" hidden>
+        <div class="consent-banner">
+          <p class="consent-warning">
+            Screenshots of your active tab may become <strong>public</strong> on the Uncognito Wall of Shame.
+          </p>
+          <button id="consentButton" type="button">I understand, enable capture</button>
+        </div>
+      </div>
+
+      <div id="controlsArea">
       <section class="field">
         <label for="backendUrlInput">Backend URL</label>
         <input id="backendUrlInput" type="url" placeholder="http://localhost:3000" />
@@ -54,6 +64,7 @@
         <a id="roastLink" target="_blank" rel="noreferrer">Open roast</a>
         <a id="linkedInLink" target="_blank" rel="noreferrer" hidden>Open LinkedIn share</a>
       </section>
+      </div>
     </main>
     <script type="module" src="./popup.js"></script>
   </body>

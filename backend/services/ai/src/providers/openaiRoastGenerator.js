@@ -27,12 +27,15 @@ export async function generateRoastCaption(options) {
   validateImageDataUrl(imageBase64);
 
   if (!apiKey) {
+    console.warn("[ai] No OPENAI_API_KEY set. Returning fallback caption.");
     return fallbackCaption;
   }
 
   if (typeof fetchImpl !== "function") {
     throw new RoastGenerationError("No fetch implementation available for OpenAI request.");
   }
+
+  console.log(`[ai] Requesting roast caption | model=${model} imageSize=${imageBase64.length} chars`);
 
   try {
     const response = await fetchImpl(OPENAI_RESPONSES_URL, {
@@ -46,16 +49,20 @@ export async function generateRoastCaption(options) {
 
     if (!response.ok) {
       const errorBody = await safeReadText(response);
+      console.error(`[ai] OpenAI request failed | status=${response.status} body=${errorBody.slice(0, 200)}`);
       throw new RoastGenerationError(`OpenAI request failed with ${response.status}: ${errorBody}`);
     }
 
     const payload = await response.json();
-    return normalizeCaption(extractCaptionText(payload), fallbackCaption);
+    const caption = normalizeCaption(extractCaptionText(payload), fallbackCaption);
+    console.log(`[ai] Caption generated | caption=${caption}`);
+    return caption;
   } catch (error) {
     if (error instanceof RoastGenerationError) {
       throw error;
     }
 
+    console.error(`[ai] Unexpected error during roast generation | error=${error.message}`);
     throw new RoastGenerationError("OpenAI roast generation failed.", { cause: error });
   }
 }
