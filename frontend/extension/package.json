@@ -1,5 +1,8 @@
 {
   "name": "@uncognito/extension",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run.js"
+  }
 }

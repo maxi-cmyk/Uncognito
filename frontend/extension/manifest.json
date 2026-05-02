@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Uncognito",
+  "description": "Opt-in browser accountability roasts for demo use.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Uncognito",
+    "default_popup": "src/popup/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background/serviceWorker.js",
+    "type": "module"
+  },
+  "permissions": ["activeTab", "alarms", "storage", "tabs"],
+  "host_permissions": ["http://localhost/*", "http://localhost:*/*", "http://127.0.0.1:*/*", "https://*/*"]
+}
