@@ -8,6 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@uncognito/ai": "*",
+    "@uncognito/shared": "*",
+    "@uncognito/social": "*",
+    "@uncognito/storage": "*",
     "next": "^15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

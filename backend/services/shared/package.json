@@ -1,5 +1,11 @@
 {
   "name": "@uncognito/shared",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./types": "./src/types/index.js",
+    "./contracts": "./src/contracts/upload.js",
+    "./validation": "./src/validation/upload.js"
+  }
 }

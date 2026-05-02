@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Header } from "./components/Header";
 import { formatRoastTime, getPublicRoasts } from "./lib/roasts";
 
-export default function HomePage() {
-  const roasts = getPublicRoasts();
+export default async function HomePage() {
+  const roasts = await getPublicRoasts();
   const featured = roasts[0];
 
   return (
@@ -20,10 +20,18 @@ export default function HomePage() {
               roast, and gives the audience a share-ready receipt.
             </p>
             <div className="hero-actions">
-              <Link className="button primary" href={featured ? `/roast/${featured.id}` : "#"}>
+              <Link
+                className="button primary"
+                href={featured ? `/roast/${featured.id}` : "#"}
+              >
                 Latest roast
               </Link>
-              <a className="button" href="https://www.linkedin.com/" rel="noreferrer" target="_blank">
+              <a
+                className="button"
+                href="https://www.linkedin.com/"
+                rel="noreferrer"
+                target="_blank"
+              >
                 LinkedIn
               </a>
             </div>
