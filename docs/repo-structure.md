@@ -94,6 +94,7 @@ This repository is organized around the simple product boundary the team wants:
 |           `-- tests/
 |-- tests/
 |   |-- README.md
+|   |-- backend-services.integration.test.js
 |   |-- e2e/
 |   `-- fixtures/
 |-- scripts/
@@ -128,5 +129,6 @@ This repository is organized around the simple product boundary the team wants:
 - Runtime validation schemas go in `backend/services/shared/src/validation`.
 - Provider integrations stay inside `backend/services/*/src/providers` or equivalent adapter folders.
 - Feature tests live near the frontend app, backend API, or service they verify.
+- Cross-service integration tests live in root `tests/*.test.js`.
 - Cross-surface browser flows live in root `tests/e2e`.
 - Fixture data that may be reused across frontend and backend lives in root `tests/fixtures`.

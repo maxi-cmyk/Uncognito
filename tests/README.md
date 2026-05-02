@@ -2,6 +2,7 @@
 
 Cross-application verification lives here.
 
+- `*.test.js` - Node integration tests that exercise multiple backend services together.
 - `e2e` - browser-level demo flows across extension, web, and API surfaces.
 - `fixtures` - reusable screenshots, payloads, and mock provider responses.
 

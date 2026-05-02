@@ -8,10 +8,10 @@
     "backend/services/*"
   ],
   "scripts": {
-    "dev": "pnpm --filter @uncognito/web --if-present dev",
-    "build": "pnpm -r --if-present build",
-    "test": "pnpm -r --if-present test",
-    "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "dev": "npm run dev --workspace @uncognito/web --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "node --test tests/*.test.js && npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   }
 }

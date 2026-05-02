@@ -7,7 +7,7 @@ Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The fron
 | Layer | Choice | Why |
 | --- | --- | --- |
 | Language | TypeScript | Shared types across frontend, extension, API, and backend services. |
-| Package manager | pnpm workspaces | Fast installs and clear workspace boundaries. |
+| Package manager | npm workspaces | Root scripts use the workspace support in `package.json`; `pnpm-workspace.yaml` is compatibility metadata only and is not required to run tests. |
 | Web frontend | Next.js | Server-rendered public pages and dynamic Open Graph metadata. |
 | Extension frontend | Chrome Manifest V3 | Required platform for alarms, popup UI, storage, and visible-tab capture. |
 | Backend API | TypeScript HTTP API | Keeps upload, roast, hide/delete, and share endpoints separate from frontend code. |
@@ -17,7 +17,7 @@ Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The fron
 | Image storage | Supabase Storage | Public bucket URLs satisfy Open Graph crawler requirements. |
 | AI | OpenAI vision-capable model via env config | The roast generator needs screenshot understanding and controlled text output. |
 | Social sharing | Manual link and LinkedIn share-link demo flow first; Telegram/Discord webhooks optional | Manual share is reliable for demos; webhooks are easier than LinkedIn automation. |
-| Unit testing | Vitest | Fast TypeScript tests for services, scheduling, contracts, and adapters. |
+| Unit testing | Node built-in test runner | Current service and integration tests run with `node --test` without extra test dependencies. |
 | E2E testing | Playwright | Browser-level verification for portal flows and share metadata. |
 | Code quality | ESLint, Prettier, TypeScript strict mode | Baseline consistency without heavy process. |
 
