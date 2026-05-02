@@ -90,7 +90,7 @@ This repository is organized around the simple product boundary the team wants:
 |           |-- migrations/
 |           |-- src/
 |           |   |-- db/
-|           |   `-- image-providers/
+|           |   `-- supabase/
 |           `-- tests/
 |-- tests/
 |   |-- README.md

@@ -91,9 +91,9 @@ Needs:
 - Randomized capture interval based on an exponential distribution.
 - Visible-tab screenshot capture.
 - Upload endpoint that receives screenshot data.
-- Image hosting through a configurable provider.
+- Screenshot image hosting through Supabase Storage.
 - AI-generated roast caption.
-- SQLite-compatible persistence.
+- Supabase-backed persistence.
 - Public roast detail page at `/roast/[id]`.
 - Open Graph metadata for roast pages.
 - Wall of Shame gallery.
@@ -308,7 +308,7 @@ Responsibilities:
 - Validate request body and content type.
 - Enforce rate limits.
 - Accept screenshot data.
-- Upload the image to the configured image provider.
+- Upload the image to Supabase Storage.
 - Generate a roast caption.
 - Persist the roast record.
 - Return the created roast ID and public URL.
@@ -422,7 +422,7 @@ LinkedIn handling:
 | `id` | string | Yes | Public-safe unique ID |
 | `imageUrl` | string | Yes | Hosted image URL |
 | `caption` | string | Yes | AI-generated roast |
-| `status` | string | Yes | `public`, `hidden`, `failed`, or `deleted` |
+| `status` | string | Yes | `processing`, `public`, `hidden`, `failed`, or `deleted` |
 | `createdAt` | datetime | Yes | Capture creation time |
 | `updatedAt` | datetime | Yes | Last state change |
 | `sourceHost` | string | No | Domain of active tab, if collected |
@@ -463,7 +463,7 @@ LinkedIn handling:
 {
   "id": "rst_123",
   "caption": "Three tabs deep into distraction and somehow still calling it research.",
-  "imageUrl": "https://image-provider.example/rst_123.png",
+  "imageUrl": "https://dgsqalakuycjxdnsdrnl.supabase.co/storage/v1/object/public/roast-images/roasts/rst_123/capture.png",
   "publicUrl": "https://uncognito.example/roast/rst_123",
   "shareStatus": "not_shared",
   "createdAt": "2026-05-02T10:00:02.000Z"
@@ -497,9 +497,9 @@ When `captureMode` is `demo_linkedin_link`, the response may also include:
 | --- | --- | --- |
 | Web app | Next.js | App Router or Pages Router are both acceptable |
 | Hosting | Vercel | Simple deploy and dynamic metadata support |
-| Database | Turso or local SQLite | Turso for deployed demo, SQLite for local fallback |
+| Database | Supabase Postgres | Hosted Postgres for deployed demo persistence |
 | Extension | Manifest V3, JavaScript or React | Keep popup small |
-| Image hosting | Cloudinary or ImgBB | Cloudinary preferred if already available |
+| Image hosting | Supabase Storage | Stable public image URLs for Open Graph previews |
 | AI | Configurable OpenAI vision-capable model | Use env var for model selection |
 | Social | Telegram, Discord, or manual share | Prefer reliable setup over LinkedIn automation |
 
@@ -511,7 +511,7 @@ Browser Extension
   -> send screenshot to /api/upload
 Backend API
   -> validate and rate limit
-  -> upload image to image provider
+  -> upload image to Supabase Storage
   -> generate roast caption with AI
   -> persist roast record
   -> optionally share link
@@ -527,9 +527,10 @@ Social Preview Crawler
 Expected variables:
 
 ```text
-DATABASE_URL=
-IMAGE_PROVIDER=
-IMAGE_PROVIDER_API_KEY=
+SUPABASE_URL=https://dgsqalakuycjxdnsdrnl.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_swa3MqwbsGNDQpYaiG9wGw_urwihpaa
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_STORAGE_BUCKET=roast-images
 OPENAI_API_KEY=
 OPENAI_VISION_MODEL=
 PUBLIC_APP_URL=
@@ -539,7 +540,7 @@ DISCORD_WEBHOOK_URL=
 ADMIN_TOKEN=
 ```
 
-Only the variables for enabled providers are required.
+`SUPABASE_SERVICE_ROLE_KEY` is required for backend writes, object deletion, and owner hide/delete flows. It must never be exposed to frontend code.
 
 ## 14. Security, Privacy, and Safety
 
@@ -680,8 +681,8 @@ Only the variables for enabled providers are required.
 | Screenshot leaks sensitive data | User trust issue | Opt-in, prompt safety, no raw logging, delete/hide; automated redaction is future work |
 | AI output is weak | Joke falls flat | Add prompt constraints and fallback captions |
 | Extension permissions are confusing | Setup friction | Keep permissions minimal and explain consent |
-| Vercel statelessness complicates storage | Lost records | Use Turso or hosted SQLite-compatible database |
-| Image hosting provider blocks uploads | Broken pages | Abstract provider and support local/mock mode |
+| Vercel statelessness complicates storage | Lost records | Use Supabase Postgres and Supabase Storage |
+| Supabase Storage upload fails | Broken pages | Mark the roast failed, avoid publishing, and use local/mock storage during development |
 | OG preview caching is slow | Demo inconsistency | Show public page directly and test preview ahead of time |
 
 ## 20. Hackathon Implementation Decisions
@@ -690,7 +691,7 @@ Only the variables for enabled providers are required.
 - **Social channel:** Manual link sharing is the guaranteed MVP path. Telegram or Discord webhook is the preferred automated stretch path.
 - **Owner controls:** Hide/delete actions require an `ADMIN_TOKEN` for the hackathon version.
 - **Repository shape:** Use one monorepo containing the web app, API routes, shared types, and extension package.
-- **Local demo fallback:** Local/mock image storage is acceptable for development, but the deployed demo should use a hosted image URL so Open Graph previews work.
+- **Local demo fallback:** Local/mock image storage is acceptable for development, but the deployed demo should use Supabase Storage public URLs so Open Graph previews work.
 
 ## 21. Future Enhancements
 

@@ -1,5 +1,6 @@
 {
   "name": "@uncognito/storage",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "description": "Supabase-backed roast metadata and image storage service"
 }

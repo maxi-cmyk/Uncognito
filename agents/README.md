@@ -22,7 +22,7 @@ This folder translates the PRD into focused implementation agents. Each agent ow
 | [AI Roast Agent](./ai-roast-generator.md) | Vision prompt, caption quality, fallback roasts | 10.4, 14.4 |
 | [Web Vault Agent](./web-vault.md) | Portal, roast pages, Open Graph metadata | 8.2, 10.6 |
 | [Social Sharing Agent](./social-sharing.md) | Copy/share, LinkedIn share-link demo flow, social preview reliability | 8.3, 9.4, 10.7 |
-| [Data Storage Agent](./data-storage.md) | Schema, persistence, image-provider boundary | 11, 13 |
+| [Data Storage Agent](./data-storage.md) | Supabase schema, persistence, and screenshot storage | 11, 13 |
 | [QA Demo Agent](./qa-demo.md) | Verification, acceptance criteria, demo readiness | 7, 15, 16, 18, 22 |
 
 ## Handoff Protocol

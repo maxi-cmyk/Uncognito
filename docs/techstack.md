@@ -12,9 +12,9 @@ Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The fron
 | Extension frontend | Chrome Manifest V3 | Required platform for alarms, popup UI, storage, and visible-tab capture. |
 | Backend API | TypeScript HTTP API | Keeps upload, roast, hide/delete, and share endpoints separate from frontend code. |
 | Hosting | Vercel or equivalent Node/serverless host | Low-friction public URLs for hackathon demos. |
-| Database | Turso SQLite | Hosted SQLite fits the PRD and keeps persistence simple. |
-| ORM/query layer | Drizzle ORM | Type-safe SQLite schema and migrations without a heavy runtime. |
-| Image storage | Cloudinary primary, ImgBB fallback | Hosted public URLs are required for Open Graph images. |
+| Database | Supabase Postgres | Hosted Postgres for roast metadata, status transitions, and public read policies. |
+| Schema migrations | Supabase SQL migrations | Direct SQL keeps schema, enums, indexes, triggers, and policies explicit. |
+| Image storage | Supabase Storage | Public bucket URLs satisfy Open Graph crawler requirements. |
 | AI | OpenAI vision-capable model via env config | The roast generator needs screenshot understanding and controlled text output. |
 | Social sharing | Manual link and LinkedIn share-link demo flow first; Telegram/Discord webhooks optional | Manual share is reliable for demos; webhooks are easier than LinkedIn automation. |
 | Unit testing | Vitest | Fast TypeScript tests for services, scheduling, contracts, and adapters. |
@@ -71,7 +71,7 @@ Owns Poisson/exponential interval generation, intensity presets, clamping, and d
 
 ### `backend/services/storage`
 
-Owns database schema, Drizzle migrations, Turso connection code, image-provider adapters, and public-safe ID generation.
+Owns Supabase Postgres schema, SQL migrations, Supabase Storage adapters, object cleanup, and public-safe ID generation.
 
 ### `backend/services/ai`
 
@@ -88,9 +88,10 @@ Owns copy/share helpers, Telegram or Discord webhook adapters, and share status 
 ## Environment Variables
 
 ```text
-DATABASE_URL=
-IMAGE_PROVIDER=
-IMAGE_PROVIDER_API_KEY=
+SUPABASE_URL=https://dgsqalakuycjxdnsdrnl.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_swa3MqwbsGNDQpYaiG9wGw_urwihpaa
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_STORAGE_BUCKET=roast-images
 OPENAI_API_KEY=
 OPENAI_VISION_MODEL=
 PUBLIC_APP_URL=
@@ -100,7 +101,7 @@ DISCORD_WEBHOOK_URL=
 ADMIN_TOKEN=
 ```
 
-Only variables for enabled providers are required. Local development may use mock image storage and fallback captions.
+`SUPABASE_SERVICE_ROLE_KEY` is backend-only and must never be exposed to `frontend/`. Local development may use mock image storage and fallback captions.
 
 ## Implementation Notes
 

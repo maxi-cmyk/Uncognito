@@ -4,7 +4,7 @@ Backend services keep the API, web app, and extension aligned without duplicatin
 
 - `shared` - contracts, shared types, and validation.
 - `random-trigger` - Poisson scheduling and intensity presets.
-- `storage` - database and image-provider adapters.
+- `storage` - Supabase Postgres and Supabase Storage adapters.
 - `ai` - roast generation, prompt management, and fallback captions.
 - `privacy` - future placeholder for redaction and privacy automation.
 - `social` - share links and optional webhook providers.

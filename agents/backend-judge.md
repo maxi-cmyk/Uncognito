@@ -27,7 +27,7 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 
 - Upload request from Extension Scout Agent.
 - Data model from Data Storage Agent.
-- Image provider adapter from Data Storage Agent.
+- Supabase storage adapter from Data Storage Agent.
 - Caption function from AI Roast Agent.
 - Share action contract from Social Sharing Agent when demo sharing is enabled.
 
@@ -60,7 +60,7 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 {
   "id": "rst_123",
   "caption": "Three tabs deep into distraction and somehow still calling it research.",
-  "imageUrl": "https://image-provider.example/rst_123.png",
+  "imageUrl": "https://dgsqalakuycjxdnsdrnl.supabase.co/storage/v1/object/public/roast-images/roasts/rst_123/capture.png",
   "publicUrl": "https://uncognito.example/roast/rst_123",
   "shareStatus": "not_shared",
   "createdAt": "2026-05-02T10:00:02.000Z"
@@ -91,7 +91,7 @@ For `captureMode: "demo_linkedin_link"`, the response may also include `shareSta
 ## Industry Practices
 
 - Validate all external input at the API boundary.
-- Keep provider calls behind adapters.
+- Keep Supabase and provider calls behind service adapters.
 - Avoid logging raw images or full prompts.
 - Make operations idempotent where reasonable.
 - Return stable error codes that clients can branch on.
