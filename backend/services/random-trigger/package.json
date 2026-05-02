@@ -1,5 +1,6 @@
 {
   "name": "@uncognito/random-trigger",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "description": "Poisson-based capture scheduling and Chrome alarm timing helpers"
 }
