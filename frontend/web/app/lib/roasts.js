@@ -1,6 +1,6 @@
 import { getPublicAppUrl } from "./url.js";
 
-const FALLBACK_ROASTS = [
+const DEV_FALLBACK_ROASTS = [
   {
     id: "demo_youtube",
     caption:
@@ -28,12 +28,19 @@ export async function getPublicRoasts() {
     const baseUrl = getPublicAppUrl();
     const res = await fetch(`${baseUrl}/api/roasts`, { next: { revalidate: 30 } });
 
-    if (!res.ok) throw new Error(`API returned ${res.status}`);
+    if (!res.ok) {
+      console.error(`API returned ${res.status} when fetching roasts`);
+      return [];
+    }
 
     const data = await res.json();
     return data.roasts || [];
-  } catch {
-    return FALLBACK_ROASTS;
+  } catch (error) {
+    if (error.cause?.code === "ECONNREFUSED" || error.message?.includes("fetch failed")) {
+      return DEV_FALLBACK_ROASTS;
+    }
+    console.error("Roast fetch error:", error.message);
+    return [];
   }
 }
 
@@ -45,8 +52,12 @@ export async function getRoast(id) {
     if (!res.ok) return null;
 
     return await res.json();
-  } catch {
-    return FALLBACK_ROASTS.find((r) => r.id === id) || null;
+  } catch (error) {
+    if (error.cause?.code === "ECONNREFUSED" || error.message?.includes("fetch failed")) {
+      return DEV_FALLBACK_ROASTS.find((r) => r.id === id) || null;
+    }
+    console.error("Roast fetch error:", error.message);
+    return null;
   }
 }
 

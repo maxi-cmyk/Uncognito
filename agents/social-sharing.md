@@ -66,7 +66,19 @@ Make each roast easy to share, while keeping the guaranteed MVP path independent
 
 ## Definition of Done
 
-- The demo can share a roast through a reliable manual path.
-- The demo can manually trigger a screenshot and LinkedIn share link on demand.
-- Optional automation does not threaten the core upload-to-page flow.
-- Share state is observable for debugging.
+- [x] The demo can share a roast through a reliable manual path.
+- [x] The demo can manually trigger a screenshot and LinkedIn share link on demand.
+- [x] Optional automation does not threaten the core upload-to-page flow.
+- [x] Share state is observable for debugging.
+
+## Implementation Status
+
+Implemented. Key files:
+
+- `backend/services/social/src/linkBuilder.js` — `generateLinkedInShareUrl` + `extractRoastUrl`
+- `backend/services/social/src/shareStatus.js` — `getInitialShareStatus` (returns `"link_ready"` for `demo_linkedin_link`), `isShareable`, `isFailed`, `isValidShareStatus`
+- `backend/services/shared/src/contracts/upload.js` — `buildUploadResponse` includes `linkedInShareUrl` when applicable
+- `frontend/web/app/api/upload/route.js` — returns `linkedInShareUrl` for `demo_linkedin_link`
+- `frontend/web/app/components/CopyButton.js` — client-side copy-to-clipboard
+- `frontend/web/app/roast/[id]/page.js` — "Share on LinkedIn" button + CopyButton
+- 21 unit tests passing (`node --test`)

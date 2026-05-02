@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
-    "@uncognito/shared": "*"
+    "@uncognito/shared": "*",
+    "pg": "^8.20.0"
   }
 }

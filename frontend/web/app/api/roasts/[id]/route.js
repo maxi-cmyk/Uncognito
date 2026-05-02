@@ -22,7 +22,7 @@ export async function GET(_request, { params }) {
 
 export async function PATCH(request, { params }) {
   const adminToken = request.headers.get("x-admin-token");
-  if (adminToken !== process.env.ADMIN_TOKEN) {
+  if (adminToken !== process.env.ADMIN_TOKEN || !process.env.ADMIN_TOKEN) {
     return NextResponse.json(
       buildErrorResponse("UNAUTHORIZED", "Valid admin token required."),
       { status: 401 },
@@ -54,7 +54,7 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   const adminToken = request.headers.get("x-admin-token");
-  if (adminToken !== process.env.ADMIN_TOKEN) {
+  if (adminToken !== process.env.ADMIN_TOKEN || !process.env.ADMIN_TOKEN) {
     return NextResponse.json(
       buildErrorResponse("UNAUTHORIZED", "Valid admin token required."),
       { status: 401 },
@@ -62,9 +62,25 @@ export async function DELETE(request, { params }) {
   }
 
   const supabase = await getSupabase();
-  const { deleteRoast } = await import("@uncognito/storage");
+  const { getRoast, deleteRoast, deleteRoastImage } = await import("@uncognito/storage");
+
+  const roast = await getRoast(supabase, params.id);
+  if (!roast) {
+    return NextResponse.json(
+      buildErrorResponse("NOT_FOUND", "Roast not found."),
+      { status: 404 },
+    );
+  }
 
   await deleteRoast(supabase, params.id);
+
+  if (roast.imagePath) {
+    try {
+      await deleteRoastImage(supabase, roast.imagePath);
+    } catch (error) {
+      console.error(`Failed to delete roast image for ${params.id}:`, error.message);
+    }
+  }
 
   return NextResponse.json({ success: true });
 }

@@ -2,24 +2,24 @@
 
 ## Stack Summary
 
-Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The frontend contains the public portal and browser extension. The backend contains the API plus focused services for contracts, storage, AI, scheduling, and social sharing.
+Uncognito uses a JavaScript monorepo split into `frontend/` and `backend/`. The frontend contains the public portal (Next.js App Router, including API routes) and browser extension. The backend contains focused service packages for contracts, storage, AI, scheduling, and social sharing.
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Language | TypeScript | Shared types across frontend, extension, API, and backend services. |
-| Package manager | npm workspaces | Root scripts use the workspace support in `package.json`; `pnpm-workspace.yaml` is compatibility metadata only and is not required to run tests. |
-| Web frontend | Next.js | Server-rendered public pages and dynamic Open Graph metadata. |
+| Language | JavaScript (ESM) | Shared types via JSDoc across frontend, extension, and backend services. |
+| Package manager | npm workspaces | Root scripts use the workspace support in `package.json`. |
+| Web frontend + API | Next.js App Router | Server-rendered pages with dynamic OG metadata; API routes co-located in `app/api/`. |
 | Extension frontend | Chrome Manifest V3 | Required platform for alarms, popup UI, storage, and visible-tab capture. |
-| Backend API | TypeScript HTTP API | Keeps upload, roast, hide/delete, and share endpoints separate from frontend code. |
-| Hosting | Vercel or equivalent Node/serverless host | Low-friction public URLs for hackathon demos. |
+| Hosting | Vercel | Low-friction public URLs for hackathon demos; Next.js native deployment. |
 | Database | Supabase Postgres | Hosted Postgres for roast metadata, status transitions, and public read policies. |
 | Schema migrations | Supabase SQL migrations | Direct SQL keeps schema, enums, indexes, triggers, and policies explicit. |
 | Image storage | Supabase Storage | Public bucket URLs satisfy Open Graph crawler requirements. |
-| AI | OpenAI vision-capable model via env config | The roast generator needs screenshot understanding and controlled text output. |
-| Social sharing | Manual link and LinkedIn share-link demo flow first | Manual share is reliable for demos. |
-| Unit testing | Node built-in test runner | Current service and integration tests run with `node --test` without extra test dependencies. |
+| AI | OpenAI vision-capable model | Uses `/v1/responses` API with JSON structured output for roast generation. |
+| API deps | `@supabase/supabase-js`, `openai` | Provider SDKs used only inside backend service packages. |
+| Social sharing | Manual link + LinkedIn share-link demo flow | `@uncognito/social` generates share URLs and manages share status; demo returns `linkedInShareUrl` in upload response. |
+| Unit testing | Node built-in test runner | Service and integration tests run with `node --test`; no extra test dependencies. |
 | E2E testing | Playwright | Browser-level verification for portal flows and share metadata. |
-| Code quality | ESLint, Prettier, TypeScript strict mode | Baseline consistency without heavy process. |
+| Code quality | ESLint, Prettier | Baseline consistency without heavy process. |
 
 ## Version Policy
 
@@ -29,41 +29,32 @@ Use current stable releases when implementation begins. Avoid hard-pinning produ
 
 ### `frontend/web`
 
-- Next.js App Router.
-- Wall of Shame gallery at `/`.
-- Server-rendered `/roast/[id]` pages with Open Graph metadata.
-- Admin or owner controls that call backend endpoints protected by `ADMIN_TOKEN`.
-- No provider SDKs in frontend code.
+- Next.js App Router with server and client components.
+- Wall of Shame gallery at `/` (async server component, fetches `/api/roasts` with 30s revalidation).
+- Server-rendered `/roast/[id]` pages with dynamic Open Graph + Twitter Card metadata.
+- Client component `CopyButton` for copy-to-clipboard roast URL sharing.
+- API routes co-located under `app/api/`:
+  - `POST /api/upload` — validate, generate caption, store image, publish roast, return `linkedInShareUrl` for demo mode.
+  - `GET /api/roasts` — list public roasts.
+  - `GET|PATCH|DELETE /api/roasts/[id]` — detail, hide (admin), delete (admin).
+  - `POST /api/share/[id]` — mark roast as shared.
+- Admin/owner endpoints protected by `x-admin-token` header against `ADMIN_TOKEN` env var.
+- In-memory mock client runs when `SUPABASE_URL` or `SUPABASE_SERVICE_ROLE_KEY` are unset.
+- No provider SDKs in client component code.
 
 ### `frontend/extension`
 
 - Manifest V3 extension.
-- TypeScript source.
-- React or lightweight DOM popup UI.
+- JavaScript source with focus on small popup footprint.
 - `chrome.storage.local` for settings.
 - `chrome.alarms` for randomized capture scheduling.
 - `chrome.tabs.captureVisibleTab` for screenshot capture.
-
-## Backend Stack
-
-### `backend/api`
-
-- TypeScript API surface for upload, roast reads, hide/delete, and optional share triggers.
-- Routes mirror the PRD contracts:
-  - `POST /upload`
-  - `GET /roasts`
-  - `GET /roasts/:id`
-  - `PATCH /roasts/:id`
-  - `DELETE /roasts/:id`
-  - `POST /share/:id` if social automation is enabled.
-- Request validation uses schemas from `backend/services/shared`.
-- API orchestration delegates to backend services instead of embedding provider logic in route files.
 
 ## Backend Services
 
 ### `backend/services/shared`
 
-Owns shared contracts, request/response types, status enums, validation schemas, and constants used across frontend and backend.
+Owns shared contracts (`buildUploadResponse`, `buildLinkedInShareUrl`, `buildErrorResponse`), domain types via JSDoc (`CaptureMode`, `Roast`, `UploadRequest`, `UploadResponse`, `ShareStatus`), and request validation (`validateUploadRequest`). Imported by all other packages and API routes.
 
 ### `backend/services/random-trigger`
 
@@ -71,19 +62,19 @@ Owns Poisson/exponential interval generation, intensity presets, clamping, and d
 
 ### `backend/services/storage`
 
-Owns Supabase Postgres schema, SQL migrations, Supabase Storage adapters, object cleanup, and public-safe ID generation.
+Owns Supabase Postgres schema, SQL migrations, and Supabase client + repository layer. Exposes `createSupabaseClient`, and full CRUD via `roastsRepository`: `createProcessingRoast`, `uploadRoastImage`, `publishRoast`, `markRoastFailed`, `listPublicRoasts`, `getPublicRoast`, `hideRoast`, `deleteRoast`, `updateShareStatus`. Depends on `@supabase/supabase-js`.
 
 ### `backend/services/ai`
 
-Owns the roast prompt, AI provider adapter, caption validation, theme metadata, and fallback captions.
+Owns the roast prompt (`ROAST_SYSTEM_PROMPT`), OpenAI provider adapter via `/v1/responses` with JSON structured output, caption validation (`normalizeCaption`), and fallback caption. Exposes `generateRoastCaption`, `buildResponsesRequest`. Fallback caption returns when no `OPENAI_API_KEY` is set. Depends on `openai`.
 
 ### `backend/services/privacy`
 
-Placeholder for future redaction, caption safety helpers, consent copy helpers, and privacy-focused fixtures. It is not an active MVP dependency.
+Placeholder for future redaction, caption safety helpers, consent copy helpers, and privacy-focused fixtures. Not an active MVP dependency.
 
 ### `backend/services/social`
 
-Owns copy/share helpers and share status normalization.
+Owns LinkedIn share URL generation (`generateLinkedInShareUrl`), share status management (`getInitialShareStatus`, `isShareable`, `isFailed`, `isValidShareStatus`). Returns `"link_ready"` for `demo_linkedin_link` capture mode. 21 unit tests covering URL building, extraction, and status transitions.
 
 ## Environment Variables
 
@@ -102,8 +93,12 @@ ADMIN_TOKEN=
 
 ## Implementation Notes
 
-- Keep provider integrations behind backend service adapters so local demo mode can work without every external service.
-- Put request and response contracts in `backend/services/shared` before implementing dependent API routes or extension calls.
-- Do not store raw base64 screenshots after successful image upload.
-- Treat AI output as untrusted and validate it before publishing.
-- Make manual capture, Screenshot + LinkedIn Link, and manual sharing work before randomized scheduling or automated posting.
+- Provider integrations (Supabase, OpenAI) stay inside backend service adapters so local demo mode works without every external service. A mock Supabase client runs when credentials are missing.
+- Request and response contracts live in `backend/services/shared/src/contracts`.
+- Domain types and enums live in `backend/services/shared/src/types`.
+- Runtime validation lives in `backend/services/shared/src/validation`.
+- Do not store raw base64 screenshots after successful image upload — the API generates the caption first, then uploads the image.
+- AI output is validated by `normalizeCaption` (JSON parse, whitespace trim, 220 char cap) before publishing.
+- API routes in `frontend/web/app/api/` delegate to backend service packages via workspace imports.
+- Manual capture, Screenshot + LinkedIn Link, and manual sharing are implemented. Randomized scheduling is next.
+- The web portal falls back to static demo data when the API is unreachable (e.g., during local development without a running server).

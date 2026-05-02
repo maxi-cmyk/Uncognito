@@ -57,6 +57,7 @@ Use Vercel MCP to verify and manage:
 - deployment logs for `/api/upload`, `/api/roasts`, `/api/roasts/:id`, `/api/share/:id`
 - production URL used by `PUBLIC_APP_URL`
 - Open Graph rendering for `/roast/[id]`
+- `/api/upload` response includes `linkedInShareUrl` when `captureMode` is `demo_linkedin_link`
 
 Expected PRD flow:
 

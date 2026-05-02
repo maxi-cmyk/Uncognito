@@ -27,8 +27,9 @@ async function initializeClient() {
 function createMockClient() {
   let nextId = 1;
   const roasts = [];
+  const uploadAttempts = [];
 
-  function buildRecord(row) {
+  function buildRoastRecord(row) {
     const id = `rst_mock_${String(nextId++).padStart(8, "0")}`;
     return {
       id,
@@ -51,44 +52,21 @@ function createMockClient() {
     };
   }
 
-  function makeSelectReturn(data) {
-    const dataArr = Array.isArray(data) ? data : [data];
-    return {
-      single() {
-        const item = dataArr[0] || null;
-        if (!item) return { data: null, error: { message: "Not found" } };
-        return { data: item, error: null };
-      },
-      order() {
-        return this;
-      },
-      range(_, __) {
-        return { data: dataArr, count: dataArr.length, error: null };
-      },
-    };
-  }
-
-  function makeFilterable(dataArr, filters) {
-    let filtered = [...dataArr];
-    if (filters?.eq) {
-      filtered = filtered.filter((r) => r[filters.eq[0]] === filters.eq[1]);
-    }
+  function makeChain(filtered, isCountQuery) {
     return {
       eq(key, value) {
-        return makeFilterable(dataArr, { eq: [key, value] });
+        return makeChain(
+          filtered.filter((r) => r[key] === value),
+          isCountQuery,
+        );
       },
-      select(columns) {
-        return {
-          ...makeSelectReturn(filtered),
-          order(col, { ascending }) {
-            return this;
-          },
-          range(_, __) {
-            return { data: filtered, count: filtered.length, error: null };
-          },
-        };
+      gte(key, value) {
+        return makeChain(
+          filtered.filter((r) => r[key] >= value),
+          isCountQuery,
+        );
       },
-      order(col, { ascending }) {
+      order() {
         return this;
       },
       single() {
@@ -96,72 +74,86 @@ function createMockClient() {
           ? { data: filtered[0], error: null }
           : { data: null, error: { message: "Not found" } };
       },
+      range(_, __) {
+        if (isCountQuery) {
+          return { count: filtered.length, error: null };
+        }
+        return { data: filtered, count: filtered.length, error: null };
+      },
     };
   }
 
-  return {
-    from(table) {
+  const roastBuilder = {
+    insert(row) {
+      const record = buildRoastRecord(row);
+      roasts.push(record);
       return {
-        insert(row) {
-          const record = buildRecord(row);
-          roasts.push(record);
+        select() {
           return {
-            select() {
-              return {
-                single() {
-                  return { data: record, error: null };
-                },
-              };
-            },
-          };
-        },
-
-        update(fields) {
-          return {
-            eq(key, value) {
-              const target = roasts.find((r) => r[key] === value);
-              if (target) Object.assign(target, fields, { updated_at: new Date().toISOString() });
-              return {
-                select() {
-                  return {
-                    single() {
-                      return target
-                        ? { data: target, error: null }
-                        : { data: null, error: { message: "Not found" } };
-                    },
-                  };
-                },
-              };
-            },
-          };
-        },
-
-        select(columns) {
-          const filtered = [...roasts];
-          return {
-            eq(key, value) {
-              const eqFiltered = filtered.filter((r) => r[key] === value);
-              return {
-                ...makeSelectReturn(eqFiltered),
-                order(col, opts) {
-                  return this;
-                },
-                range(_, __) {
-                  return { data: eqFiltered, count: eqFiltered.length, error: null };
-                },
-              };
-            },
-            order(col, opts) {
-              return this;
-            },
             single() {
-              return { data: null, error: { message: "Not found" } };
+              return { data: record, error: null };
             },
           };
         },
       };
     },
+    update(fields) {
+      return {
+        eq(key, value) {
+          const target = roasts.find((r) => r[key] === value);
+          if (target) Object.assign(target, fields, { updated_at: new Date().toISOString() });
+          return {
+            select() {
+              return {
+                single() {
+                  return target
+                    ? { data: target, error: null }
+                    : { data: null, error: { message: "Not found" } };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+    select(columns, opts) {
+      const isCount = !!(opts?.count && opts?.head);
+      return makeChain([...roasts], isCount);
+    },
+  };
 
+  const uploadAttemptsBuilder = {
+    insert(record) {
+      uploadAttempts.push({
+        ...record,
+        id: `ua_${String(Date.now())}_${Math.random().toString(36).slice(2, 8)}`,
+        created_at: new Date().toISOString(),
+      });
+      return { select() { return { single() { return { data: null, error: null }; } }; } };
+    },
+    select(columns, opts) {
+      const isCount = !!(opts?.count && opts?.head);
+      return makeChain([...uploadAttempts], isCount);
+    },
+  };
+
+  const tableRegistry = {
+    roasts: roastBuilder,
+    upload_attempts: uploadAttemptsBuilder,
+    roast_events: {
+      insert() {
+        return null;
+      },
+      select() {
+        return makeChain([]);
+      },
+    },
+  };
+
+  return {
+    from(table) {
+      return tableRegistry[table] || roastBuilder;
+    },
     storage: {
       from(bucket) {
         return {
