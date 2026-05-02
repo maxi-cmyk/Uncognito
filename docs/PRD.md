@@ -394,16 +394,18 @@ Requirements:
 
 ### 10.7 Social Sharing
 
-MVP:
+MVP (implemented):
 
-- Copy/share roast link.
-- Ensure Open Graph metadata works.
+- Copy/share roast link (client component `CopyButton` in roast detail page).
+- Open Graph + Twitter Card metadata server-rendered on `/roast/[id]`.
+- LinkedIn share URL generated via `@uncognito/social` and returned in upload response for `demo_linkedin_link` capture mode.
 
-LinkedIn handling:
+LinkedIn handling (implemented):
 
-- Provide a LinkedIn share URL or manual copy flow.
-- The demo may expose a "Screenshot + LinkedIn Link" action that creates a roast and returns a LinkedIn share URL.
-- Official LinkedIn API integration is stretch because API permissions are unpredictable in hackathon time.
+- LinkedIn share URL generated from roast public URL using `https://www.linkedin.com/sharing/share-offsite/` with title and summary parameters.
+- `POST /api/upload` with `captureMode: "demo_linkedin_link"` returns `shareStatus: "link_ready"` and `linkedInShareUrl` in the response.
+- Roast detail page includes a "Share on LinkedIn" button that opens the LinkedIn share URL.
+- Official LinkedIn API integration remains stretch.
 
 ## 11. Data Model
 
@@ -462,14 +464,16 @@ LinkedIn handling:
 }
 ```
 
-When `captureMode` is `demo_linkedin_link`, the response may also include:
+When `captureMode` is `demo_linkedin_link`, the response includes:
 
 ```json
 {
   "shareStatus": "link_ready",
-  "linkedInShareUrl": "https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Funcognito.example%2Froast%2Frst_123"
+  "linkedInShareUrl": "https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Funcognito.example%2Froast%2Frst_123&title=Uncognito+caught+a+roast&summary=Three+tabs+deep..."
 }
 ```
+
+This is implemented in `backend/services/shared/src/contracts/upload.js` (`buildUploadResponse`).
 
 ### 12.3 Error Response
 
@@ -487,13 +491,13 @@ When `captureMode` is `demo_linkedin_link`, the response may also include:
 
 | Component | Recommended Technology | Notes |
 | --- | --- | --- |
-| Web app | Next.js | App Router or Pages Router are both acceptable |
+| Web app + API | Next.js App Router | Server-rendered pages + API routes co-located in `app/api/` |
 | Hosting | Vercel | Simple deploy and dynamic metadata support |
 | Database | Supabase Postgres | Hosted Postgres for deployed demo persistence |
-| Extension | Manifest V3, JavaScript or React | Keep popup small |
+| Extension | Manifest V3, JavaScript | Keep popup small |
 | Image hosting | Supabase Storage | Stable public image URLs for Open Graph previews |
-| AI | Configurable OpenAI vision-capable model | Use env var for model selection |
-| Social | Manual share and LinkedIn share-link demo flow | Prefer reliable setup over LinkedIn automation |
+| AI | OpenAI Responses API (`/v1/responses`) | JSON structured output via `gpt-4.1-mini`; configurable via `OPENAI_VISION_MODEL` |
+| Social | Manual link + LinkedIn share-link demo flow | `@uncognito/social` generates share URLs; no provider credentials required |
 
 ### 13.2 System Flow
 
