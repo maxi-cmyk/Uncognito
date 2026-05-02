@@ -2,24 +2,19 @@ import { CAPTURE_MODES } from "../lib/defaults.js";
 
 const elements = {
   enabledInput: document.querySelector("#enabledInput"),
-  backendUrlInput: document.querySelector("#backendUrlInput"),
   intensityInput: document.querySelector("#intensityInput"),
   statusText: document.querySelector("#statusText"),
   lastCaptureText: document.querySelector("#lastCaptureText"),
   nextCaptureText: document.querySelector("#nextCaptureText"),
   roastNowButton: document.querySelector("#roastNowButton"),
-  linkedInButton: document.querySelector("#linkedInButton"),
-  linksSection: document.querySelector("#linksSection"),
-  roastLink: document.querySelector("#roastLink"),
-  linkedInLink: document.querySelector("#linkedInLink"),
+  openSiteButton: document.querySelector("#openSiteButton"),
 };
 
 document.addEventListener("DOMContentLoaded", hydrate);
 elements.enabledInput.addEventListener("change", updateSettingsFromForm);
-elements.backendUrlInput.addEventListener("change", updateSettingsFromForm);
 elements.intensityInput.addEventListener("change", updateSettingsFromForm);
-elements.roastNowButton.addEventListener("click", () => capture(CAPTURE_MODES.MANUAL));
-elements.linkedInButton.addEventListener("click", () => capture(CAPTURE_MODES.LINKEDIN_LINK));
+elements.roastNowButton.addEventListener("click", () => capture());
+elements.openSiteButton.addEventListener("click", openSite);
 
 async function hydrate() {
   const settings = await sendMessage({ type: "GET_SETTINGS" });
@@ -33,7 +28,6 @@ async function updateSettingsFromForm() {
       type: "UPDATE_SETTINGS",
       patch: {
         enabled: elements.enabledInput.checked,
-        backendUrl: elements.backendUrlInput.value,
         intensity: elements.intensityInput.value,
       },
     });
@@ -45,18 +39,29 @@ async function updateSettingsFromForm() {
   }
 }
 
-async function capture(captureMode) {
+async function capture() {
   setBusy(true);
   elements.statusText.textContent = "Capturing...";
 
   try {
-    const upload = await sendMessage({ type: "CAPTURE_NOW", captureMode });
+    const upload = await sendMessage({ type: "CAPTURE_NOW", captureMode: CAPTURE_MODES.MANUAL });
     const settings = await sendMessage({ type: "GET_SETTINGS" });
     render(settings);
 
-    if (upload?.publicUrl) {
+    // Auto-open LinkedIn share after roast is created
+    if (upload?.linkedInShareUrl) {
+      elements.statusText.textContent = "Roast created — opening LinkedIn...";
+      chrome.tabs.create({ url: upload.linkedInShareUrl });
+    } else if (upload?.publicUrl) {
       elements.statusText.textContent = "Roast created.";
     }
+
+    // Glow the site button after successful roast
+    const btn = elements.openSiteButton;
+    btn.classList.remove("glowing");
+    void btn.offsetWidth;
+    btn.classList.add("glowing");
+    btn.addEventListener("animationend", () => btn.classList.remove("glowing"), { once: true });
   } catch (error) {
     elements.statusText.textContent = error.message;
   } finally {
@@ -64,29 +69,24 @@ async function capture(captureMode) {
   }
 }
 
+async function openSite() {
+  const settings = await sendMessage({ type: "GET_SETTINGS" });
+  const url = settings.backendUrl || "http://localhost:3000";
+  chrome.tabs.create({ url });
+}
+
 function render(settings) {
   elements.enabledInput.checked = settings.enabled;
-  elements.backendUrlInput.value = settings.backendUrl;
   elements.intensityInput.value = settings.intensity;
   elements.statusText.textContent = settings.lastStatus;
   elements.lastCaptureText.textContent = formatDate(settings.lastCaptureAt) ?? "Never";
   elements.nextCaptureText.textContent = formatDate(settings.nextCaptureAt) ?? "Not scheduled";
-
-  const hasRoastLink = Boolean(settings.lastRoastUrl);
-  const hasLinkedInLink = Boolean(settings.linkedInShareUrl);
-
-  elements.linksSection.hidden = !hasRoastLink && !hasLinkedInLink;
-  elements.roastLink.hidden = !hasRoastLink;
-  elements.roastLink.href = settings.lastRoastUrl ?? "#";
-  elements.linkedInLink.hidden = !hasLinkedInLink;
-  elements.linkedInLink.href = settings.linkedInShareUrl ?? "#";
 }
 
 function setBusy(isBusy) {
   elements.roastNowButton.disabled = isBusy;
-  elements.linkedInButton.disabled = isBusy;
+  elements.openSiteButton.disabled = isBusy;
   elements.enabledInput.disabled = isBusy;
-  elements.backendUrlInput.disabled = isBusy;
   elements.intensityInput.disabled = isBusy;
 }
 

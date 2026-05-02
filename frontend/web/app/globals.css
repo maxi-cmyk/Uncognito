@@ -261,6 +261,7 @@ h2 {
 }
 
 @media (max-width: 860px) {
+
   .hero,
   .grid {
     grid-template-columns: 1fr;

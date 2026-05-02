@@ -22,11 +22,6 @@
     </header>
 
     <section class="field">
-      <label for="backendUrlInput">Backend URL</label>
-      <input id="backendUrlInput" type="url" placeholder="http://localhost:3000" />
-    </section>
-
-    <section class="field">
       <label for="intensityInput">Intensity</label>
       <select id="intensityInput">
         <option value="low">Low</option>
@@ -37,8 +32,8 @@
     </section>
 
     <section class="actions">
-      <button id="roastNowButton" type="button">Roast me now</button>
-      <button id="linkedInButton" type="button">Screenshot + LinkedIn Link</button>
+      <button id="roastNowButton" type="button">🔥Roast me now🔥</button>
+      <button id="openSiteButton" type="button" class="secondary">Open Wall of Shame ↗</button>
     </section>
 
     <dl class="meta">
@@ -51,11 +46,6 @@
         <dd id="nextCaptureText">Not scheduled</dd>
       </div>
     </dl>
-
-    <section class="links" id="linksSection" hidden>
-      <a id="roastLink" target="_blank" rel="noreferrer">Open roast</a>
-      <a id="linkedInLink" target="_blank" rel="noreferrer" hidden>Open LinkedIn share</a>
-    </section>
   </main>
   <script type="module" src="./popup.js"></script>
 </body>
