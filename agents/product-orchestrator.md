@@ -44,7 +44,9 @@ Keep Uncognito scoped as a small hackathon MVP while preserving the core product
 
 - Immediate publishing is the default after explicit opt-in.
 - Manual link sharing is the guaranteed social path.
+- Screenshot + LinkedIn Link is a demo-only manual path that prepares a roast URL and LinkedIn share URL without requiring LinkedIn API access.
 - Telegram or Discord webhook is stretch.
+- Privacy redaction is deferred until after the MVP demo; opt-in, hide/delete, rate limits, and no raw screenshot logging remain in scope.
 - `ADMIN_TOKEN` protects hide/delete actions.
 - Monorepo is the default repository shape.
 - Hosted image URLs are required for deployed Open Graph previews.
@@ -54,6 +56,7 @@ Keep Uncognito scoped as a small hackathon MVP while preserving the core product
 - To Backend Judge Agent: final MVP API route list and rate-limit expectations.
 - To Extension Scout Agent: required extension states and demo-mode behavior.
 - To Web Vault Agent: public page and gallery acceptance requirements.
+- To Social Sharing Agent: manual LinkedIn share-link output requirements.
 - To QA Demo Agent: final demo script and acceptance checklist.
 
 ## Definition of Done

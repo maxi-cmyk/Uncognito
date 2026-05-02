@@ -23,9 +23,9 @@ Generate short, funny, safe roast captions from screenshots without exposing sen
 ## Inputs
 
 - Hosted image URL or image payload.
-- Optional redacted metadata: `sourceHost`, `sourceTitle`.
+- Optional metadata: `sourceHost`, `sourceTitle`.
 - Prior themes from Data Storage Agent if available.
-- Safety constraints from Privacy Redaction Agent.
+- Product safety constraints from Product Orchestrator.
 
 ## Required Outputs
 
@@ -61,7 +61,6 @@ Keep it under 220 characters.
 ## Collaboration Contracts
 
 - **Consumes:** image URL or image payload from Backend Judge Agent.
-- **Consumes:** sensitive-pattern rules from Privacy Redaction Agent.
 - **Produces:** `caption` and optional `themes`.
 - **Hands off to Data Storage Agent:** generated caption and theme metadata.
 

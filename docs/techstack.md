@@ -2,7 +2,7 @@
 
 ## Stack Summary
 
-Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The frontend contains the public portal and browser extension. The backend contains the API plus focused services for contracts, storage, AI, privacy, scheduling, and social sharing.
+Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The frontend contains the public portal and browser extension. The backend contains the API plus focused services for contracts, storage, AI, scheduling, and social sharing.
 
 | Layer | Choice | Why |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ Uncognito uses a TypeScript repo split into `frontend/` and `backend/`. The fron
 | ORM/query layer | Drizzle ORM | Type-safe SQLite schema and migrations without a heavy runtime. |
 | Image storage | Cloudinary primary, ImgBB fallback | Hosted public URLs are required for Open Graph images. |
 | AI | OpenAI vision-capable model via env config | The roast generator needs screenshot understanding and controlled text output. |
-| Social sharing | Manual link share first; Telegram/Discord webhooks optional | Manual share is reliable for demos; webhooks are easier than LinkedIn automation. |
+| Social sharing | Manual link and LinkedIn share-link demo flow first; Telegram/Discord webhooks optional | Manual share is reliable for demos; webhooks are easier than LinkedIn automation. |
 | Unit testing | Vitest | Fast TypeScript tests for services, scheduling, contracts, and adapters. |
 | E2E testing | Playwright | Browser-level verification for portal flows and share metadata. |
 | Code quality | ESLint, Prettier, TypeScript strict mode | Baseline consistency without heavy process. |
@@ -79,7 +79,7 @@ Owns the roast prompt, AI provider adapter, caption validation, theme metadata, 
 
 ### `backend/services/privacy`
 
-Owns redaction patterns, caption safety checks, consent copy helpers, and privacy-focused test fixtures.
+Placeholder for future redaction, caption safety helpers, consent copy helpers, and privacy-focused fixtures. It is not an active MVP dependency.
 
 ### `backend/services/social`
 
@@ -108,4 +108,4 @@ Only variables for enabled providers are required. Local development may use moc
 - Put request and response contracts in `backend/services/shared` before implementing dependent API routes or extension calls.
 - Do not store raw base64 screenshots after successful image upload.
 - Treat AI output as untrusted and validate it before publishing.
-- Make manual capture and manual sharing work before randomized scheduling or automated posting.
+- Make manual capture, Screenshot + LinkedIn Link, and manual sharing work before randomized scheduling or automated posting.

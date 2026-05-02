@@ -25,7 +25,7 @@ Define and implement the persistence layer for roast records, settings, image-pr
 - Data model from PRD.
 - Backend API needs.
 - Web portal read needs.
-- Privacy deletion/hide requirements.
+- Product hide/delete requirements.
 - Hosted-image requirement for Open Graph previews.
 
 ## Required Outputs
@@ -47,9 +47,9 @@ Define and implement the persistence layer for roast records, settings, image-pr
 | `createdAt` | Yes | Capture creation time |
 | `updatedAt` | Yes | Last state change |
 | `sourceHost` | No | Domain if collected |
-| `sourceTitle` | No | Redacted title if collected |
+| `sourceTitle` | No | Tab title if collected |
 | `themes` | No | JSON theme metadata |
-| `shareStatus` | No | `not_shared`, `shared`, or `failed` |
+| `shareStatus` | No | `not_shared`, `link_ready`, `shared`, or `failed` |
 | `errorReason` | No | Failure diagnostics without sensitive data |
 
 ## Environment Variables
@@ -73,7 +73,7 @@ PUBLIC_APP_URL=
 
 - **Produces:** storage functions for Backend Judge Agent.
 - **Produces:** read functions for Web Vault Agent.
-- **Consumes:** delete/hide policy from Privacy Redaction Agent.
+- **Consumes:** hide/delete policy from Product Orchestrator and Backend Judge Agent.
 - **Hands off to Social Sharing Agent:** `shareStatus` persistence.
 
 ## Testing Checklist

@@ -9,7 +9,7 @@ Uncognito is a small hackathon MVP for opt-in browser accountability: a Chrome e
 - `frontend/web/` - Next.js web portal.
 - `frontend/extension/` - Chrome Manifest V3 extension.
 - `backend/api/` - upload, roast, admin, and sharing API surface.
-- `backend/services/` - backend domain services for contracts, scheduling, storage, AI, privacy, and social sharing.
+- `backend/services/` - backend domain services for contracts, scheduling, storage, AI, and social sharing.
 - `tests/` - cross-application end-to-end fixtures and flows.
 - `scripts/` - local development and automation scripts.
 - `config/` - shared tool configuration.

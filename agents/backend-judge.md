@@ -29,7 +29,7 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 - Data model from Data Storage Agent.
 - Image provider adapter from Data Storage Agent.
 - Caption function from AI Roast Agent.
-- Redaction rules from Privacy Redaction Agent.
+- Share action contract from Social Sharing Agent when demo sharing is enabled.
 
 ## Required Outputs
 
@@ -46,11 +46,13 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 {
   "imageBase64": "data:image/png;base64,...",
   "sourceHost": "example.com",
-  "sourceTitle": "Optional redacted tab title",
+  "sourceTitle": "Optional tab title",
   "captureMode": "random",
   "clientTimestamp": "2026-05-02T10:00:00.000Z"
 }
 ```
+
+`captureMode` may be `random`, `manual`, or `demo_linkedin_link`.
 
 ### Upload Response
 
@@ -60,9 +62,12 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
   "caption": "Three tabs deep into distraction and somehow still calling it research.",
   "imageUrl": "https://image-provider.example/rst_123.png",
   "publicUrl": "https://uncognito.example/roast/rst_123",
+  "shareStatus": "not_shared",
   "createdAt": "2026-05-02T10:00:02.000Z"
 }
 ```
+
+For `captureMode: "demo_linkedin_link"`, the response may also include `shareStatus: "link_ready"` and `linkedInShareUrl`.
 
 ### Error Response
 
@@ -95,7 +100,7 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 
 - **Consumes:** storage and image APIs from Data Storage Agent.
 - **Consumes:** `generateRoastCaption` contract from AI Roast Agent.
-- **Consumes:** redaction policy from Privacy Redaction Agent.
+- **Consumes:** optional share trigger contract from Social Sharing Agent.
 - **Produces:** API response contracts for Extension Scout Agent and Web Vault Agent.
 
 ## Testing Checklist
@@ -106,6 +111,7 @@ Own the backend upload pipeline that validates screenshots, coordinates image ho
 - AI failure returns fallback behavior.
 - Hidden roasts are excluded from public list responses.
 - Hide/delete requires authorization.
+- `demo_linkedin_link` capture mode can create a roast and return a LinkedIn share URL without requiring LinkedIn API access.
 
 ## Definition of Done
 

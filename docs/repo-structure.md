@@ -18,7 +18,6 @@ This repository is organized around the simple product boundary the team wants:
 |   |-- backend-judge.md
 |   |-- data-storage.md
 |   |-- extension-scout.md
-|   |-- privacy-redaction.md
 |   |-- product-orchestrator.md
 |   |-- qa-demo.md
 |   |-- random-trigger.md
@@ -66,9 +65,7 @@ This repository is organized around the simple product boundary the team wants:
 |       |   `-- tests/
 |       |-- privacy/
 |       |   |-- README.md
-|       |   |-- package.json
-|       |   |-- src/redaction/
-|       |   `-- tests/fixtures/
+|       |   `-- package.json
 |       |-- random-trigger/
 |       |   |-- README.md
 |       |   |-- package.json
@@ -118,7 +115,7 @@ This repository is organized around the simple product boundary the team wants:
 - `backend/services/random-trigger` belongs to the Random Trigger Agent.
 - `backend/services/storage` belongs to the Data Storage Agent.
 - `backend/services/ai` belongs to the AI Roast Agent.
-- `backend/services/privacy` belongs to the Privacy Redaction Agent.
+- `backend/services/privacy` is a future-work placeholder owned by the Product Orchestrator until privacy automation is scheduled.
 - `backend/services/social` belongs to the Social Sharing Agent.
 - `tests` belongs to the QA Demo Agent.
 - `docs` and `agents` belong to the Product Orchestrator unless a specific functional owner needs to update its own contract.

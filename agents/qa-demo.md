@@ -38,6 +38,7 @@ Verify that the MVP works as a live hackathon demo and that each core requiremen
 - Extension starts disabled.
 - User can enable capture.
 - Manual roast creates a screenshot upload.
+- Manual Screenshot + LinkedIn Link creates a screenshot upload and returns a LinkedIn share URL.
 - Backend creates a roast record.
 - AI or fallback caption is present.
 - Image URL is public or demo-accessible.
@@ -56,7 +57,6 @@ Verify that the MVP works as a live hackathon demo and that each core requiremen
 - AI generation failure.
 - Database write failure.
 - Rate limit hit.
-- Sensitive-pattern screenshot.
 - Social posting failure.
 - Stale Open Graph cache.
 
@@ -80,17 +80,25 @@ Verify that the MVP works as a live hackathon demo and that each core requiremen
 1. Open the portal and show the Wall of Shame.
 2. Open the extension popup.
 3. Enable demo mode.
-4. Click "Roast me now."
+4. Click "Roast me now" for the normal manual path.
 5. Wait for the upload response.
 6. Open the returned roast URL.
 7. Confirm the gallery updates.
-8. Copy or share the link.
-9. Hide/delete the entry.
-10. Explain randomized mode and the Poisson trigger.
+8. Trigger "Screenshot + LinkedIn Link" for the demo social path.
+9. Confirm the extension shows a LinkedIn share URL for the roast URL.
+10. Copy or share the link manually.
+11. Hide/delete the entry.
+12. Explain randomized mode and the Poisson trigger.
+
+## Manual Demo Options
+
+- **Roast me now:** capture the visible tab, upload it, create a roast, and return the public roast URL.
+- **Screenshot + LinkedIn Link:** capture the visible tab, upload it with `captureMode: "demo_linkedin_link"`, create a roast, and return the public roast URL plus a LinkedIn share URL. This path is for demo purposes and must not depend on official LinkedIn API posting permissions.
 
 ## Definition of Done
 
 - The demo path has been run successfully from extension to portal.
+- The LinkedIn share-link demo path has been manually verified or documented as unavailable.
 - Must-have PRD items have pass/fail evidence.
 - Known failures have explicit fallback guidance.
 - The team can present without relying on a fragile random event.

@@ -6,9 +6,9 @@
 **Project Type:** Small hackathon MVP  
 **Core Idea:** A deliberately chaotic accountability app that captures random browser screenshots, uses AI vision to generate a sharp roast, and publishes the result to a shareable web page that can be posted to social channels.
 
-Uncognito turns hidden procrastination into public theater. A browser extension takes unpredictable screenshots, the system runs privacy checks and generates an AI roast, and a web portal displays the capture as a public "Wall of Shame" entry with social-preview metadata.
+Uncognito turns hidden procrastination into public theater. A browser extension takes unpredictable screenshots, the backend generates an AI roast, and a web portal displays the capture as a public "Wall of Shame" entry with social-preview metadata.
 
-The product is intentionally absurd, but the implementation should be privacy-conscious: users must opt in, pause the system, delete posts, and avoid exposing obvious secrets.
+The product is intentionally absurd, but the implementation should be privacy-conscious: users must opt in, pause the system, delete posts, and avoid logging sensitive screenshot data. Automated redaction is deferred until after the MVP.
 
 ## 2. Vision
 
@@ -70,14 +70,14 @@ Needs:
 - Store each roast with an image URL, caption, timestamp, and status.
 - Render a public roast page with Open Graph metadata for link previews.
 - Provide a Wall of Shame gallery.
-- Include basic safety controls: enable/disable, redaction, delete, and rate limits.
+- Include basic safety controls: enable/disable, delete, rate limits, and no raw screenshot logging.
 
 ### 5.2 Non-Goals
 
 - No hidden monitoring.
 - No multi-user enterprise admin dashboard.
 - No browser history analysis beyond captured screenshots.
-- No guaranteed perfect PII detection.
+- No automated screenshot redaction in the hackathon MVP.
 - No complex social scheduling or analytics.
 - No native mobile app.
 - No paid billing system.
@@ -97,7 +97,6 @@ Needs:
 - Public roast detail page at `/roast/[id]`.
 - Open Graph metadata for roast pages.
 - Wall of Shame gallery.
-- Basic screenshot redaction before public display.
 - Manual delete or hide action for a roast.
 - Rate limit to prevent runaway posting.
 
@@ -105,6 +104,7 @@ Needs:
 
 - Local extension settings for intensity level.
 - Manual "Roast me now" button for demo reliability.
+- Manual "Screenshot + LinkedIn Link" action for demo sharing.
 - Demo mode with short capture intervals.
 - Share button that copies the roast URL.
 - Status indicators for last capture and next scheduled capture.
@@ -123,8 +123,8 @@ Needs:
 
 ### 6.4 Out of Scope for Hackathon MVP
 
-- Fully automated LinkedIn posting via official APIs.
-- Sophisticated computer-vision PII detection.
+- Official LinkedIn API publishing.
+- Automated screenshot redaction or sophisticated computer-vision PII detection.
 - Payment or subscription plans.
 - Organization workspaces.
 - Mobile browser support.
@@ -146,7 +146,7 @@ Needs:
 - Screenshot upload plus page creation completes in under 10 seconds for typical images.
 - No more than one post is created per configured rate-limit window.
 - Manual deletion or hiding takes effect immediately in the public gallery.
-- Sensitive-pattern masking catches obvious emails, long numbers, password-field labels, and token-like strings before public display.
+- The system avoids raw screenshot logging and supports immediate hide/delete for bad captures.
 
 ## 8. User Experience
 
@@ -159,6 +159,7 @@ Primary controls:
 - Enable or disable Uncognito.
 - Choose intensity: low, medium, high, or demo.
 - Trigger a manual roast for demos.
+- Trigger a manual screenshot plus LinkedIn share link for demos.
 - See last capture status.
 - See next capture estimate when available.
 
@@ -195,7 +196,7 @@ For the MVP, social sharing can be link-based instead of fully automated. The ro
 - `og:url`
 - `twitter:card`
 
-If automated posting is attempted, Telegram or Discord webhook integration is preferred for hackathon reliability. LinkedIn can be represented through a share URL or manual copy flow unless API access is already available.
+If automated posting is attempted, Telegram or Discord webhook integration is preferred for hackathon reliability. LinkedIn is represented through a share URL unless API access is already available.
 
 ## 9. Core User Flows
 
@@ -213,14 +214,13 @@ If automated posting is attempted, Telegram or Discord webhook integration is pr
 1. Extension alarm fires.
 2. Extension checks whether capture is enabled.
 3. Extension captures the visible tab.
-4. Extension performs lightweight redaction or sends data to backend redaction.
-5. Extension uploads the screenshot.
-6. Backend stores the image.
-7. Backend asks the AI model for a roast caption.
-8. Backend writes a roast record.
-9. Portal renders the new roast page.
-10. Optional social channel receives the link.
-11. Extension schedules the next random capture.
+4. Extension uploads the screenshot.
+5. Backend stores the image.
+6. Backend asks the AI model for a roast caption.
+7. Backend writes a roast record.
+8. Portal renders the new roast page.
+9. Optional social channel receives the link.
+10. Extension schedules the next random capture.
 
 ### 9.3 Manual Demo Roast Flow
 
@@ -230,7 +230,15 @@ If automated posting is attempted, Telegram or Discord webhook integration is pr
 4. Extension displays the created roast URL.
 5. User opens or shares the result.
 
-### 9.4 Delete or Hide Flow
+### 9.4 Manual Screenshot + LinkedIn Link Demo Flow
+
+1. User clicks "Screenshot + LinkedIn Link."
+2. Extension captures the current tab immediately with `captureMode: "demo_linkedin_link"`.
+3. Backend generates a roast and public roast URL.
+4. Social sharing logic prepares a LinkedIn share URL.
+5. Extension displays the roast URL and LinkedIn share URL for manual demo sharing.
+
+### 9.5 Delete or Hide Flow
 
 1. User opens the roast page or owner dashboard.
 2. User chooses hide/delete.
@@ -300,7 +308,6 @@ Responsibilities:
 - Validate request body and content type.
 - Enforce rate limits.
 - Accept screenshot data.
-- Apply server-side redaction if implemented.
 - Upload the image to the configured image provider.
 - Generate a roast caption.
 - Persist the roast record.
@@ -345,9 +352,11 @@ Do not reveal private data, credentials, personal identifiers, or sensitive text
 Keep it under 220 characters.
 ```
 
-### 10.5 Redaction and Privacy Controls
+### 10.5 Deferred Redaction and Active Privacy Controls
 
-Minimum redaction targets:
+Automated screenshot redaction is deferred until after the hackathon MVP. The MVP must not claim that screenshots are redacted before display.
+
+Future redaction targets:
 
 - Email addresses.
 - Phone-number-like strings.
@@ -356,14 +365,18 @@ Minimum redaction targets:
 - API-key-like strings.
 - Long numeric identifiers.
 
-MVP implementation options:
+Future implementation options:
 
 - Extension-side DOM-aware masking before capture for visible inputs where possible.
 - Backend image redaction for obvious OCR-detected patterns if OCR is available.
-- Prompt-level instruction to avoid quoting sensitive screenshot text.
-- Owner delete/hide controls as a final safety net.
 
-The PRD treats redaction as risk reduction, not a perfect privacy guarantee. The user must see this in onboarding.
+Active MVP privacy controls:
+
+- Extension starts disabled and requires explicit opt-in.
+- UI states that screenshots can become public.
+- Backend avoids logging raw screenshots, raw base64, and full prompts.
+- AI prompt and validation avoid quoting private text from screenshots.
+- Owner hide/delete controls exist as the final safety net.
 
 ### 10.6 Web Portal: "The Vault"
 
@@ -397,7 +410,8 @@ Preferred hackathon automation:
 LinkedIn handling:
 
 - Provide a LinkedIn share URL or manual copy flow.
-- Fully automated LinkedIn posting is stretch because API permissions are unpredictable in hackathon time.
+- The demo may expose a "Screenshot + LinkedIn Link" action that creates a roast and returns a LinkedIn share URL.
+- Official LinkedIn API integration is stretch because API permissions are unpredictable in hackathon time.
 
 ## 11. Data Model
 
@@ -412,9 +426,9 @@ LinkedIn handling:
 | `createdAt` | datetime | Yes | Capture creation time |
 | `updatedAt` | datetime | Yes | Last state change |
 | `sourceHost` | string | No | Domain of active tab, if collected |
-| `sourceTitle` | string | No | Redacted tab title, if collected |
+| `sourceTitle` | string | No | Tab title, if collected |
 | `themes` | JSON | No | AI themes used for variety |
-| `shareStatus` | string | No | `not_shared`, `shared`, or `failed` |
+| `shareStatus` | string | No | `not_shared`, `link_ready`, `shared`, or `failed` |
 | `errorReason` | string | No | Stored only for failed records |
 
 ### 11.2 Settings
@@ -435,11 +449,13 @@ LinkedIn handling:
 {
   "imageBase64": "data:image/png;base64,...",
   "sourceHost": "example.com",
-  "sourceTitle": "Optional redacted tab title",
+  "sourceTitle": "Optional tab title",
   "captureMode": "random",
   "clientTimestamp": "2026-05-02T10:00:00.000Z"
 }
 ```
+
+`captureMode` may be `random`, `manual`, or `demo_linkedin_link`.
 
 ### 12.2 Upload Response
 
@@ -449,7 +465,17 @@ LinkedIn handling:
   "caption": "Three tabs deep into distraction and somehow still calling it research.",
   "imageUrl": "https://image-provider.example/rst_123.png",
   "publicUrl": "https://uncognito.example/roast/rst_123",
+  "shareStatus": "not_shared",
   "createdAt": "2026-05-02T10:00:02.000Z"
+}
+```
+
+When `captureMode` is `demo_linkedin_link`, the response may also include:
+
+```json
+{
+  "shareStatus": "link_ready",
+  "linkedInShareUrl": "https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Funcognito.example%2Froast%2Frst_123"
 }
 ```
 
@@ -528,7 +554,7 @@ Only the variables for enabled providers are required.
 
 - Do not collect full browser history.
 - Do not collect cookies.
-- Do not collect page HTML unless required for redaction.
+- Do not collect page HTML.
 - Do not store raw base64 after image upload succeeds.
 - Hide or delete roasts on user request.
 - Avoid logging screenshot data or full AI prompts in server logs.
@@ -558,7 +584,7 @@ Only the variables for enabled providers are required.
 | AI generation fails | Use fallback caption or mark record failed |
 | Database write fails | Do not share link; surface error |
 | Rate limit hit | Return retry time and schedule later capture |
-| Screenshot contains sensitive data | Redact where possible; allow immediate hide/delete |
+| Screenshot contains sensitive data | Do not log raw data; allow immediate hide/delete; redaction is future work |
 | Social posting fails | Keep roast page available and mark share failed |
 | OG crawler caches old metadata | Provide clear page content even if preview is stale |
 
@@ -593,6 +619,7 @@ Only the variables for enabled providers are required.
 
 - Demo mode can produce a roast within 60 seconds.
 - Manual roast flow works from extension to portal.
+- Manual Screenshot + LinkedIn Link flow returns a roast URL and LinkedIn share URL.
 - Public URL opens on a clean browser session.
 - Social preview can read metadata.
 
@@ -622,7 +649,6 @@ Only the variables for enabled providers are required.
 ### Phase 4: Safety and Polish
 
 - Add rate limiting.
-- Add basic redaction.
 - Add hide/delete.
 - Add Open Graph metadata.
 - Add share/copy flow.
@@ -650,8 +676,8 @@ Only the variables for enabled providers are required.
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| LinkedIn automation is difficult | Demo may fail | Use manual share or Telegram/Discord first |
-| Screenshot leaks sensitive data | User trust issue | Opt-in, redaction, prompt safety, delete/hide |
+| LinkedIn API access is difficult | Demo may fail | Use a manual LinkedIn share link or Telegram/Discord first |
+| Screenshot leaks sensitive data | User trust issue | Opt-in, prompt safety, no raw logging, delete/hide; automated redaction is future work |
 | AI output is weak | Joke falls flat | Add prompt constraints and fallback captions |
 | Extension permissions are confusing | Setup friction | Keep permissions minimal and explain consent |
 | Vercel statelessness complicates storage | Lost records | Use Turso or hosted SQLite-compatible database |

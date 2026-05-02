@@ -25,7 +25,7 @@ Build the public web portal that turns each roast into a clear, shareable artifa
 
 - Roast records from Data Storage Agent.
 - Public API or server data access from Backend Judge Agent.
-- Hide/delete authorization expectations from Privacy Redaction Agent.
+- Hide/delete authorization expectations from Product Orchestrator and Backend Judge Agent.
 - Social metadata requirements from Social Sharing Agent.
 
 ## Required Outputs
@@ -62,7 +62,7 @@ Build the public web portal that turns each roast into a clear, shareable artifa
 - **Consumes:** roast schema from Data Storage Agent.
 - **Consumes:** public URL convention from Backend Judge Agent.
 - **Produces:** shareable URLs for Extension Scout Agent and Social Sharing Agent.
-- **Coordinates with Privacy Redaction Agent:** hidden/deleted and owner-control behavior.
+- **Coordinates with Backend Judge Agent:** hidden/deleted and owner-control behavior.
 
 ## Testing Checklist
 
