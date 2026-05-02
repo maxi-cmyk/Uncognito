@@ -74,11 +74,11 @@ p {
   transition: transform 150ms ease;
 }
 
-.switch input:checked + span {
+.switch input:checked+span {
   background: #ef4444;
 }
 
-.switch input:checked + span::after {
+.switch input:checked+span::after {
   transform: translateX(20px);
 }
 
@@ -125,7 +125,7 @@ button {
   cursor: pointer;
 }
 
-button + button {
+button+button {
   color: #f8fafc;
   background: #2563eb;
 }

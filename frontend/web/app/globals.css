@@ -51,25 +51,33 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-size: 22px;
   font-weight: 900;
-  letter-spacing: 0;
-}
-
-.brand-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
-  font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
 .nav {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.nav-icon {
+  display: inline-flex;
+  min-height: 38px;
+  width: 38px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.nav-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #444;
 }
 
 .nav a,
