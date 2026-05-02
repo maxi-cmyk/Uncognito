@@ -1,4 +1,6 @@
-export const roasts = [
+import { getPublicAppUrl } from "./url.js";
+
+const FALLBACK_ROASTS = [
   {
     id: "demo_youtube",
     caption:
@@ -7,16 +9,6 @@ export const roasts = [
       "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=1200&q=80",
     sourceHost: "youtube.com",
     createdAt: "2026-05-02T05:35:48.000Z",
-    status: "public",
-  },
-  {
-    id: "demo_telegram",
-    caption:
-      "Nothing says deep work like decoding campus gossip with the intensity of a federal investigation.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?auto=format&fit=crop&w=1200&q=80",
-    sourceHost: "web.telegram.org",
-    createdAt: "2026-05-02T05:35:11.000Z",
     status: "public",
   },
   {
@@ -31,12 +23,31 @@ export const roasts = [
   },
 ];
 
-export function getPublicRoasts() {
-  return roasts.filter((roast) => roast.status === "public");
+export async function getPublicRoasts() {
+  try {
+    const baseUrl = getPublicAppUrl();
+    const res = await fetch(`${baseUrl}/api/roasts`, { next: { revalidate: 30 } });
+
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
+
+    const data = await res.json();
+    return data.roasts || [];
+  } catch {
+    return FALLBACK_ROASTS;
+  }
 }
 
-export function getRoast(id) {
-  return getPublicRoasts().find((roast) => roast.id === id) ?? null;
+export async function getRoast(id) {
+  try {
+    const baseUrl = getPublicAppUrl();
+    const res = await fetch(`${baseUrl}/api/roasts/${id}`, { next: { revalidate: 30 } });
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch {
+    return FALLBACK_ROASTS.find((r) => r.id === id) || null;
+  }
 }
 
 export function formatRoastTime(value) {

@@ -1,5 +1,13 @@
 {
   "name": "@uncognito/social",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./linkBuilder": "./src/linkBuilder.js",
+    "./shareStatus": "./src/shareStatus.js"
+  },
+  "dependencies": {
+    "@uncognito/shared": "*"
+  }
 }

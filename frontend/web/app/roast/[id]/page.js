@@ -2,14 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Header } from "../../components/Header";
-import { formatRoastTime, getPublicRoasts, getRoast } from "../../lib/roasts";
+import { CopyButton } from "../../components/CopyButton";
+import { formatRoastTime, getRoast } from "../../lib/roasts";
+import { getPublicAppUrl } from "../../lib/url";
 
-export function generateStaticParams() {
-  return getPublicRoasts().map((roast) => ({ id: roast.id }));
-}
-
-export function generateMetadata({ params }) {
-  const roast = getRoast(params.id);
+export async function generateMetadata({ params }) {
+  const roast = await getRoast(params.id);
 
   if (!roast) {
     return {
@@ -35,15 +33,18 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function RoastDetailPage({ params }) {
-  const roast = getRoast(params.id);
+export default async function RoastDetailPage({ params }) {
+  const roast = await getRoast(params.id);
 
   if (!roast) {
     notFound();
   }
 
+  const baseUrl = getPublicAppUrl();
+  const publicUrl = `${baseUrl}/roast/${roast.id}`;
+
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    `/roast/${roast.id}`,
+    publicUrl,
   )}`;
 
   return (
@@ -60,9 +61,15 @@ export default function RoastDetailPage({ params }) {
             <p className="caption">{roast.caption}</p>
             <p className="meta">{formatRoastTime(roast.createdAt)}</p>
             <div className="share-row">
-              <a className="button primary" href={linkedInShareUrl} rel="noreferrer" target="_blank">
-                LinkedIn share link
+              <a
+                className="button primary"
+                href={linkedInShareUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Share on LinkedIn
               </a>
+              <CopyButton url={publicUrl} />
               <Link className="button" href="/">
                 Wall of Shame
               </Link>
